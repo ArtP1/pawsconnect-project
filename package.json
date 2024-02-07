@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon server.js",
-    "client": "cd client && npm start"
+    "dev": "concurrently \"pnpm run server\" \"pnpm run client\"",
+    "server": "cd server && pnpm start",
+    "client": "cd client && pnpm start",
+    "install-all": "pnpm i && cd client && pnpm i && cd ../server && pnpm i"
   },
   "keywords": [],
   "author": "",
