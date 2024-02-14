@@ -1,13 +1,17 @@
 const express = require('express');
-const app = express();
-const routes = require('./routes/index');
+const server = express();
+const ApiRoutes = require('./routes/index');
 
-app.use(express.json());
+server.use(express.json());
+server.use(express.urlencoded({ extended: true }))
+server.use(express.static('public'))
+
 
 // current available route /api/users
-app.use('/api', routes);
+server.use('/api', ApiRoutes);
 
-app.listen(3000, () => {
+
+server.listen(3000, () => {
   console.log(`Server is running on port http://localhost:3000`);
 });
 

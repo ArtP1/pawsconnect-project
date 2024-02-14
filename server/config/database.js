@@ -3,11 +3,11 @@ var { Pool } = require('pg');
 
 // you must retrieve all configuration settings
 const pool = new Pool({
-    database: 'pawsconnect', // replace with your database name
-    user: 'postgres', // usually postgres
-    password: 'Chipotle831100_', // replace with the password entered in pgAdmin4
-    host: 'localhost', // usually localhost
-    port: 5432 // usually 5432
+    database: '', // replace with your database name
+    user: '', // usually postgres
+    password: '', // replace with the password entered in pgAdmin4
+    host: '', // usually localhost
+    port:  // usually 5432
     // SSL (Secure Sockets Layer) is a form of encryption that ensures that data transmitter between your app and the PostgreSQL server is secure and protected from eavesdropping or main-in-the-middle attacks.
     // ssl: true, 
     // max specifies the maximum number of clients (connections) the pool should contain.
