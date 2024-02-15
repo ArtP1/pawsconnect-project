@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"pnpm run server\" \"pnpm run client\"",
     "server": "cd server && pnpm start",
-    "client": "cd client && pnpm start",
+    "client": "cd client && pnpm run dev",
     "install-all": "pnpm i && cd client && pnpm i && cd ../server && pnpm i"
   },
   "keywords": [],
