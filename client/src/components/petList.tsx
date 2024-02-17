@@ -10,7 +10,7 @@ interface PetListProps {
 export const PetList: React.FC<PetListProps> = ({ pets }) => (
   <ul className="petList">
     {pets.map(pet => (
-      <li key={pet.id}>
+      <li key={pet.pet_id}>
         <figure className="petPhoto">
           <img src={pet.profile_picture} alt="doggo"/>
           <figcaption>{pet.name} - {pet.breed}</figcaption>

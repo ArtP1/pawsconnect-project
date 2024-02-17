@@ -1,8 +1,9 @@
 // Source: https://github.com/brianc/node-postgres/tree/master/packages/pg-pool
 // const { Pool } = require('pg');
+const { PROTOCOL, HOST, USER, PASSWORD, DATABASE } = require('../configs').db;
 const { Client } = require('pg');
 
-const connectionString = ""; // Replace this with your PostgreSQL connection string
+const connectionString = `${PROTOCOL}://${USER}:${PASSWORD}@${HOST}/${DATABASE}`; // Replace this with your PostgreSQL connection string
 
 // // you must retrieve all configuration settings
 // const pool = new Pool({

@@ -2,7 +2,7 @@ client/.gitignore
 client/README.md
 client/node_modules
 
-
+server/.gitignore
 server/node_modules
 
 # Logs
@@ -80,11 +80,14 @@ server/*.tsbuildinfo
 .yarn-integrity
 
 # dotenv environment variable files
-server/.env
-server/.env.development.local
-server/.env.test.local
-server/.env.production.local
-server/.env.local
+server/.env*
+server/.flaskenv*
+server/!.env.project
+server/!.env.vault
+client/.env*
+client/.flaskenv*
+client/!.env.project
+client/!.env.vault
 
 # parcel-bundler cache (https://parceljs.org/)
 server/.cache

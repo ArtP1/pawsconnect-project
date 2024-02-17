@@ -7,24 +7,24 @@ const { executeQuery } = require('../config/utils');
         post_id: Integer,
         user_id: Integer,
         content: Text,
-        visibility: character varying,
-        created_at: timestamp without time zone,
-        updated_at: timestamp without time zone,
-        caption: Text
+        caption: Text,
+        visibility: Character Varying,
+        created_at: TimeStamp,
+        updated_at: TimeStamp
     }
 */
 
 const postsModel = {
     getPosts: async () => {
-        return await executeQuery('SELECT * FROM \"Posts\"'); 
+        return await executeQuery('SELECT * FROM \"posts\"'); 
         // Expected output: https://drive.google.com/file/d/1MbDb3SK7ZnGiWSeB9Gma2ZvZ2XMrwMIT/view?usp=drive_link
     },
     getPostByUserId: async (user_id) => {
-        return await executeQuery(`SELECT * FROM \"Posts\" WHERE user_id = $1`, [user_id]); // instead of using ? like in MySQL we use $1, $2, $3 in PostgreSQL
+        return await executeQuery(`SELECT * FROM \"posts\" WHERE user_id = $1`, [user_id]); // instead of using ? like in MySQL we use $1, $2, $3 in PostgreSQL
         // Expected output: https://drive.google.com/file/d/1rFHlh6Z1MZzi7Tlx-rDU_5zKco-WItDz/view?usp=drive_link
     },
     getPostById: async (id) => {
-        return await executeQuery('SELECT * FROM \"Posts\" WHERE post_id = $1', [id]); 
+        return await executeQuery('SELECT * FROM \"posts\" WHERE post_id = $1', [id]); 
         // Expected output: https://drive.google.com/file/d/1qyBEF2dbcKtMBNQOzsVgYmhyFdwkrfug/view?usp=drive_link
     }
 }
