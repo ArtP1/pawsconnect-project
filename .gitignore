@@ -82,12 +82,12 @@ server/*.tsbuildinfo
 # dotenv environment variable files
 server/.env*
 server/.flaskenv*
-server/!.env.project
-server/!.env.vault
+!server/.env.project
+!server/.env.vault
 client/.env*
 client/.flaskenv*
-client/!.env.project
-client/!.env.vault
+!client/.env.project
+!client/.env.vault
 
 # parcel-bundler cache (https://parceljs.org/)
 server/.cache
