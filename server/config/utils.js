@@ -1,4 +1,4 @@
-const pool = require('../config/database');
+const client = require('../config/database');
 
 
 const catchAsync = (fn) => async (req, res) => {
@@ -12,7 +12,7 @@ const catchAsync = (fn) => async (req, res) => {
 
 const executeQuery = async (query, params = []) => {
     try {
-        const { rows, fields } = await pool.query(query, params);
+        const { rows, fields } = await client.query(query, params);
         return rows;
     } catch (err) {
         throw err;

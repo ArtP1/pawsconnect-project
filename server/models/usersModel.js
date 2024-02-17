@@ -16,11 +16,11 @@ const { executeQuery } = require('../config/utils');
 
 const usersModel = {
     getUsers: async () => {
-        return await executeQuery('SELECT * FROM \"Users\"'); 
+        return await executeQuery('SELECT * FROM \"users\"'); 
         // Expected output: https://drive.google.com/file/d/17OP1E2e4u9R2xMeXNO9k4f0YdhWlmRI8/view?usp=drive_link
     },
     getUserById: async (id) => {
-        return await executeQuery(`SELECT * FROM \"Users\" WHERE user_id = $1`, [id]); // instead of using ? like in MySQL we use $1, $2, $3 in PostgreSQL
+        return await executeQuery(`SELECT * FROM \"users\" WHERE user_id = $1`, [id]); // instead of using ? like in MySQL we use $1, $2, $3 in PostgreSQL
         // Expected output: https://drive.google.com/file/d/1Sh0yW2SxTrNVeAOvam3yoVjSlW7srTjJ/view?usp=drive_link
     },
     getUserFriendsById: async (id) => {
