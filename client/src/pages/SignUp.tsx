@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-
+import { configs }  from "@/configs";
+const BASE_URL = configs.api.BASE_URL;
 export const SignUpPage = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,12 +17,12 @@ export const SignUpPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/routes/signup', { // Adjust the API endpoint as needed
+      const response = await fetch(`${BASE_URL}/users/signup`, { // Adjust the API endpoint as needed
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (response.ok) {
@@ -58,14 +58,10 @@ export const SignUpPage = () => {
         </div>
         <form onSubmit={handleSignUp} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="first-name">First Name</Label>
-              <Input id="first-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="John" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="last-name">Last Name</Label>
-              <Input id="last-name" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Doe" required />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="m@example.com" required type="text" />
+          </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

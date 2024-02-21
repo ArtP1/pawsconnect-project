@@ -21,10 +21,12 @@ const usersController = {
     }),
 
     signup: catchAsync(async (req, res) => {
-        const { username, email, password, location } = req.body;
+        const { username, email, password } = req.body;
+        console.log(username);
 
         // Check if the user already exists using the executeQuery utility function
-        const userExists = await executeQuery('SELECT * FROM users WHERE email = $1', [email]);
+        const userExists = await usersModel.getUserByEmail(email);
+
         if (userExists.length > 0) {
             return res.status(400).json({ message: 'User already exists' });
         }
@@ -34,16 +36,14 @@ const usersController = {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // Insert the new user using the executeQuery utility function
-        const newUserRows = await executeQuery(
-            'INSERT INTO users (username, email, password, location) VALUES ($1, $2, $3, $4) RETURNING *',
-            [username, email, hashedPassword, location]
-        );
+        const newUserRows = await usersModel.addUser(username, email, hashedPassword)
 
         // Assuming executeQuery returns the rows directly, we can directly access the first row
         const newUser = newUserRows[0];
 
         // Exclude password from the response
         const { password: _, ...userWithoutPassword } = newUser;
+        console.log(newUser);
         res.status(201).json({ user: userWithoutPassword });
     })
 }

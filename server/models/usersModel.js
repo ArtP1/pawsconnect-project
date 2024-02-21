@@ -34,6 +34,12 @@ const usersModel = {
     getUserFriendsById: async (id) => {
         return await executeQuery(`SELECT * FROM \"userrelationships\" WHERE user_id = $1`, [id]); // instead of using? like in MySQL we use $1, $2, $3 in PostgreSQL
         // Expected output: https://drive.google.com/file/d/12hq6UpLz78d1w5LiWApQErBwspnFLKec/view?usp=drive_link
+    },
+    getUserByEmail: async(email) => {
+        return await executeQuery(`SELECT * FROM \"users\" WHERE email = $1`, [email]);
+    },
+    addUser: async(username, email, hashedPassword, location) => {
+        return await executeQuery(`INSERT INTO \"users\" (username, email, password) VALUES ($1, $2, $3) RETURNING *`, [username, email, hashedPassword]);
     }
 }
 
