@@ -1,8 +1,11 @@
-// Might be used later on...
-function authenticate(req, res, next) {
-    console.log(`Received a ${req.method} request to ${req.url}`);
-    next(); 
+// authenticate.js
+function authenticated(req, res, next) {
+    if (req.session && req.session.authenticated) {
+        next();
+    } else {
+        res.redirect('/login'); // or res.status(401).json({ message: 'Unauthorized' });
+    }
 }
-  
 
-module.exports = authenticate;
+module.exports = authenticated; // Make sure this matches the function name
+

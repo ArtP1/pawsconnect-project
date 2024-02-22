@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { configs }  from "@/configs";
+import { configs } from "@/configs";
 const BASE_URL = configs.api.BASE_URL;
 export const SignUpPage = () => {
   const [username, setUsername] = useState('');
@@ -57,11 +57,9 @@ export const SignUpPage = () => {
           <p className="text-gray-600 dark:text-gray-400">Enter your information to create an account</p>
         </div>
         <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="m@example.com" required type="text" />
-          </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

@@ -41,6 +41,7 @@ const usersModel = {
     addUser: async(username, email, hashedPassword, location) => {
         return await executeQuery(`INSERT INTO \"users\" (username, email, password) VALUES ($1, $2, $3) RETURNING *`, [username, email, hashedPassword]);
     }
+
 }
 
 

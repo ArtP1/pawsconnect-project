@@ -1,7 +1,8 @@
-const { catchAsync } = require('../config/utils'); 
+const { catchAsync } = require('../config/utils');
 const usersModel = require('../models/usersModel');
 const bcrypt = require('bcryptjs');
 const client = require('../config/database'); // Ensure the path matches your project structure
+const session = require("express-session");
 
 
 const usersController = {
@@ -45,7 +46,41 @@ const usersController = {
         const { password: _, ...userWithoutPassword } = newUser;
         console.log(newUser);
         res.status(201).json({ user: userWithoutPassword });
+    }),
+
+    login: catchAsync(async (req, res) => {
+        const { email, password } = req.body;
+    
+        // Check if the user exists
+        const userRows = await usersModel.getUserByEmail(email);
+        if (userRows.length === 0) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const user = userRows[0];
+        console.log(user);
+    
+        // Compare the provided password with the stored hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        
+        // Successful login, set up session
+        // req.session.authenticated = true;
+        // req.session.user = { id: user.id, email: user.email }; // Store essential user info, avoid storing sensitive info
+    
+        // Respond to the client
+        const { password: _, ...userWithoutPassword } = user; // Exclude password from the response
+        res.json({
+            message: 'Login successful',
+            user: userWithoutPassword
+        });
     })
+    
+
+
+
+
 }
 
 
