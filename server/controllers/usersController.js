@@ -57,7 +57,7 @@ const usersController = {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         const user = userRows[0];
-        console.log(user);
+        // console.log(user);
     
         // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
@@ -66,9 +66,9 @@ const usersController = {
         }
         
         // Successful login, set up session
-        // req.session.authenticated = true;
-        // req.session.user = { id: user.id, email: user.email }; // Store essential user info, avoid storing sensitive info
-    
+        req.session.authenticated = true;
+        req.session.user = { id: user.user_id, email: user.email }; // Store essential user info, avoid storing sensitive info
+        console.log(req.session.user)
         // Respond to the client
         const { password: _, ...userWithoutPassword } = user; // Exclude password from the response
         res.json({

@@ -14,7 +14,8 @@ module.exports = {
         }
     },
     server: {
-        PORT: process.env.SERVER_PORT || 3000
+        PORT: process.env.SERVER_PORT || 3000,
+        SECRET_KEY: process.env.SECRET_KEY
     },
     client: {
         BASE_URL: process.env.VITE_API_BASE_URL,

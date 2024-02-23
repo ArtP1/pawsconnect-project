@@ -7,9 +7,10 @@ router.get('/:id', usersController.getUserById);
 router.get('/:id/friends', usersController.getUserFriendsById);
 
 // Updated to use the signup method from usersController
-router.post('/signup', usersController.signup);
+router.post('/signup',usersController.signup);
 
 router.post('/login', usersController.login);
+
 
 
 module.exports = router;
