@@ -6,6 +6,7 @@ import { NavMenu } from '@/components/navmenu';
 import './App.css'
 import { SignUpPage } from "./pages/SignUp";
 import { PetsViewPage } from "./pages/petsView";
+import { ManageProfiles } from "./pages/ManageProfiles";
 
 
 // React Router Github reference: Tutorial [https://reactrouter.com/en/main/start/tutorial]
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/signup" element={<SignUpPage/>}/>
         <Route path="/petsView" element={<PetsViewPage/>}/>
+        <Route path="/profiles" element={<ManageProfiles/>}/>
       </Routes>
     </Router>
   );

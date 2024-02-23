@@ -36,6 +36,10 @@ export function NavMenu() {
             <MdOutlinePets />
             <span>Pets View</span>
           </Link>
+          <Link to="/profiles" className="flex items-center space-x-2">
+            <MdOutlinePets />
+            <span>Manage Profile</span>
+          </Link>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

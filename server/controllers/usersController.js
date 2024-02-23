@@ -74,7 +74,12 @@ const usersController = {
         res.json({
             message: 'Login successful',
             user: userWithoutPassword
-        });
+        })
+    },
+    ),
+    sesh: catchAsync(async (req, res) => {
+        const sessionData = req.session.user;
+        res.json({ data: sessionData });
     })
     
 
