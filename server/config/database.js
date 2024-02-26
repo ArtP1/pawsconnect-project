@@ -1,13 +1,11 @@
 // Source: https://github.com/brianc/node-postgres/tree/master/packages/pg-pool
 // const { Pool } = require('pg');
-const { PROTOCOL, HOST, USER, PASSWORD, DATABASE } = require('../configs').db;
+const { PROTOCOL, HOST, USER, PASSWORD, DATABASE } = require('./configs').db;
 const { Client } = require('pg');
-
-const connectionString = `${PROTOCOL}://${USER}:${PASSWORD}@${HOST}/${DATABASE}`; // Replace this with your PostgreSQL connection string
 
 
 const client = new Client({
-    connectionString: connectionString
+    connectionString: `${PROTOCOL}://${USER}:${PASSWORD}@${HOST}/${DATABASE}`
 });
 
 

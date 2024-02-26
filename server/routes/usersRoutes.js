@@ -1,17 +1,21 @@
 const express = require('express');
 const usersController = require('../controllers/usersController');
 const router = express.Router();
-const isAuthenticated = require('../middleware/authenticate');
+const { validateUserSignup } = require('../middleware/validation/userValidation');
+const loginLimiter = require('../middleware/rateLimit');
+const { isAuthenticated } = require('../middleware/authHandler');
 
-router.get('/', usersController.getUsers);
-router.get('/:id', usersController.getUserById);
-router.get('/:id/friends', usersController.getUserFriendsById);
 
-// Updated to use the signup method from usersController
-router.post('/signup',usersController.signup);
+// Accessbile to the public
+router.post('/signup', validateUserSignup, usersController.signup);
+router.post('/login', loginLimiter, usersController.login);
 
-router.post('/login', usersController.login);
-router.get('/session', isAuthenticated, usersController.sesh);
 
+// Accessible to Members only
+router.get('/profile', isAuthenticated, usersController.getUserById);
+router.post('/profile/update', isAuthenticated, usersController.updateProfile);
+
+// Used to refresh JWT token 
+router.post('/refresh', isAuthenticated, usersController.refreshToken);
 
 module.exports = router;

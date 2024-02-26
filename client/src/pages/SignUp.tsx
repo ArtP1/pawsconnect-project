@@ -4,50 +4,124 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
-import { configs } from "@/configs";
-const BASE_URL = configs.api.BASE_URL;
-export const SignUpPage = () => {
+import useSignIn from "react-auth-kit/hooks/useSignIn";
+
+interface InputError {
+  type: string,
+  value: string,
+  msg: string,
+  path: 'firstName' | 'lastName' | 'username' | 'email' | 'password',
+  location: string
+}
+
+interface IUserData {
+  id: string;
+};
+
+export function SignUpPage() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const signIn = useSignIn<IUserData>();
 
-  const handleSignUp = async (e: { preventDefault: () => void; }) => {
+  const handleSignUp = async (e: { preventDefault: () => void; }) => { // preventDefault, makes sure the form is not submitted if blank
     e.preventDefault();
 
     try {
-      const response = await fetch(`${BASE_URL}/users/signup`, { // Adjust the API endpoint as needed
+      const response = await fetch("/api/users/signup", { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ firstName, lastName, username, email, password })
       });
 
+      setFirstNameError('');
+      setLastNameError('');
+      setUsernameError('');
+      setEmailError('');
+      setPasswordError('');
+      setError('');
+
       if (response.ok) {
-        navigate('/login'); // Redirect to login page on successful sign-up
+        const resp = await response.json();
+
+        signIn({
+          auth: {
+            token: resp.data.accessToken,
+            type: "Bearer"
+          },
+          userState: { id: resp.data.id },
+          refresh: resp.data.refreshToken
+        });
+
+        navigate('/'); 
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Failed to sign up');
+        const error = await response.json();
+        
+        console.log(error);
+
+        if(error.data.length > 0) {
+          error.data.forEach((err: InputError) => {
+
+            switch(err.path) {
+              case 'firstName':
+                setFirstNameError(err.msg);
+                break;
+              case 'lastName':
+                setLastNameError(err.msg);
+                break;
+              case 'username':
+                setUsernameError(err.msg);
+                break;
+              case 'email':
+                setEmailError(err.msg);
+                break;
+              case 'password':
+                setPasswordError(err.msg);
+                break;
+              default:
+                break;
+            }
+
+          });
+
+        } else {
+          setError("Failed to sign up");
+        }
       }
-    } catch (error) {
-      setError('Network error');
+    } catch (err) {
+      console.error(err); // This will give you more insight into the error
+      setError("Network error");
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-12 space-y-4 text-center lg:grid lg:gap-0 lg:grid-cols-2">
       <div className="hidden lg:flex flex-col items-center justify-center space-y-2">
         <img
-          alt="Welcome to Pets"
+          alt="Image"
           className="rounded-full"
+          height="400"
           src="https://hgtvhome.sndimg.com/content/dam/images/hgtv/fullset/2022/6/16/1/shutterstock_1862856634.jpg.rend.hgtvcom.1280.853.suffix/1655430860853.jpeg"
-          style={{ aspectRatio: "400/400", objectFit: "cover" }}
+          style={{
+            aspectRatio: "400/400",
+            objectFit: "cover",
+          }}
           width="400"
         />
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-red-600 dark:text-yellow-400">Welcome to Pets</h1>
+          <h1 className="text-3xl font-bold text-red-600 dark:text-yellow-400">Welcome to PawsConnect</h1>
           <p className="text-gray-600 dark:text-gray-400">Pet management app</p>
         </div>
       </div>
@@ -57,31 +131,95 @@ export const SignUpPage = () => {
           <p className="text-gray-600 dark:text-gray-400">Enter your information to create an account</p>
         </div>
         <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="m@example.com" required type="text" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="m@example.com" required type="email" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" value={password} onChange={(e) => setPassword(e.target.value)} required type="password" />
-          </div>
-          {error && <div className="text-red-500">{error}</div>}
-          <Button type="submit" className="w-full bg-blue-600 text-white dark:bg-green-400">
-            Sign Up
-          </Button>
-          <Separator className="my-8" />
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?
-            <Link to="/login" className="underline text-blue-600 dark:text-green-400">
-              Login
-            </Link>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <Label className="text-blue-600 dark:text-green-400" htmlFor="first-name">First name</Label>
+                <Input 
+                  className="text-gray-600 dark:text-gray-400" 
+                  id="first-name" 
+                  placeholder="Lee" 
+                  value={firstName} 
+                  onChange={(e) => setFirstName(e.target.value)} 
+                  required
+                  type='text'/>
+              </div>
+            
+              <div className="space-y-2" >
+                <Label className="text-blue-600 dark:text-green-400" htmlFor="last-name">Last name</Label>
+                <Input 
+                  className="text-gray-600 dark:text-gray-400" 
+                  id="last-name"
+                  placeholder="Robinson"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required 
+                  type='text'/>
+              </div>
+
+              { (firstNameError && lastNameError) ? 
+                <div className="col-span-2 text-red-400 text-sm">* Both names must be alphabetical characters</div> :
+                (firstNameError) ?
+                  <div className="col-span-2 text-red-400 text-sm">* {firstNameError}</div> :
+                    <div className="col-span-2 text-red-400 text-sm">* {lastNameError}</div>}
+
+            </div>
+            <div className="space-y-2">
+                <Label className="text-blue-600 dark:text-green-400" htmlFor="username">Username</Label>
+                <Input 
+                  className="text-gray-600 dark:text-gray-400" 
+                  id="username"
+                  placeholder="leeRob123"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required 
+                  type='text'/>
+            </div>
+            
+            { usernameError && <div className="text-red-400 text-sm">* {usernameError}</div> }
+
+            <div className="space-y-2">
+              <Label className="text-blue-600 dark:text-green-400" htmlFor="email">Email</Label>
+              <Input
+                className="text-gray-600 dark:text-gray-400"
+                id="email"
+                placeholder="lee@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                type="email"/>
+            </div>
+
+            {emailError && <div className="text-red-400 text-sm">* {emailError}</div>}
+
+            <div className="space-y-2">
+              <Label className="text-blue-600 dark:text-green-400" htmlFor="password">Password</Label>
+              <Input 
+                className="text-gray-600 dark:text-gray-400"
+                id="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+                type="password"/>
+            </div>
+
+            { (error || passwordError) && <div className="text-red-500 text-sm">{error || passwordError}</div> }
+
+            <Button className="w-full bg-blue-600 text-white dark:bg-green-400" type="submit">Sign Up</Button>
+
+            <Separator className="my-8" />
+
+            <div className="space-y-4">
+              <Button className="w-full text-blue-600 dark:text-green-400" variant="outline">Sign up with Google</Button>
+              <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                <span className='mr-2.5'>Already have an account?</span>
+                <Link className="underline text-blue-600 dark:text-green-400" to="/login">Login</Link>
+              </div>
+            </div>
           </div>
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
+

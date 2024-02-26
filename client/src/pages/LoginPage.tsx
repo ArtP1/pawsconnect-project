@@ -3,35 +3,49 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { configs } from "@/configs";
-const BASE_URL = configs.api.BASE_URL;
+import useSignIn from "react-auth-kit/hooks/useSignIn";
+
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  
+  const signIn = useSignIn();
+
 
   const handleLogin = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${BASE_URL}/users/login`, {
+      const response = await fetch("/api/users/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password })
       });
 
       if (response.ok) {
-        navigate('/'); // Redirect to the home page or dashboard
+        const resp = await response.json();
+
+        signIn({
+          auth: {
+            token: resp.data.accessToken,
+            type: "Bearer"
+          },
+          userState: { id: resp.data.id  },
+          refresh: resp.data.refreshToken
+        });
+
+        navigate('/');
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to login');
       }
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
+      
       setError('Network error');
     }
   };
@@ -51,7 +65,7 @@ export const LoginPage = () => {
           width="400"
         />
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Welcome to Pets</h1>
+          <h1 className="text-3xl font-bold">Welcome to PawsConnect</h1>
           <p className="text-gray-500 dark:text-gray-400">Pet management app</p>
         </div>
       </div>

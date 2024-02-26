@@ -1,4 +1,5 @@
 const client = require('../config/database');
+const { sendResponse } = require('./responseHandler');
 
 
 const catchAsync = (fn) => async (req, res) => {
@@ -6,7 +7,7 @@ const catchAsync = (fn) => async (req, res) => {
       await fn(req, res);
     } catch (err) {
       console.error(`Error: ${err.message}`);
-      res.status(500).json({message: "Oops! Something went wrong on our end."});
+      sendResponse(res, 500, null, "Oops! Something went wrong on our end.");
     }
 };
 

@@ -15,8 +15,14 @@
     "nodemon": "^3.0.3"
   },
   "dependencies": {
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.4",
-    "pg": "^8.11.3"
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "winston": "^3.11.0"
   }
 }

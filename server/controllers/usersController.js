@@ -1,91 +1,86 @@
 const { catchAsync } = require('../config/utils');
 const usersModel = require('../models/usersModel');
 const bcrypt = require('bcryptjs');
-const client = require('../config/database'); // Ensure the path matches your project structure
-const session = require("express-session");
+const { SALT_ROUNDS, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES_IN, 
+        REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRES_IN } = require('../config/configs').security;
+const { sendResponse } = require('../config/responseHandler');
+const jwt = require("jsonwebtoken");
 
 
 const usersController = {
     getUsers: catchAsync(async (req, res) => {
         const users = await usersModel.getUsers();
-        res.json(users);
+        sendResponse(res, 200, users, "Users retrieved successfully");
     }),
     getUserById: catchAsync(async (req, res) => {
-        const { id } = req.params;
+        const { id } = req.user;
+
         const user = await usersModel.getUserById(id);
-        res.json(user);
+
+        const {password, ...userWithoutPassword} = user;
+
+        if(!user) {
+            return sendResponse(res, 404, {}, "User not found");
+        }
+
+        sendResponse(res, 200, userWithoutPassword, "User retrieved successfully");
     }),
     getUserFriendsById: catchAsync(async (req, res) => {
         const { id } = req.params;
         const userFriends = await usersModel.getUserFriendsById(id);
-        res.json(userFriends)
+        sendResponse(res, 200, userFriends, "User friends retrieved succesfully");
     }),
-
     signup: catchAsync(async (req, res) => {
-        const { username, email, password } = req.body;
-        console.log(username);
+        const { firstName, lastName, username, email, password } = req.body;
+        parseInt(SALT_ROUNDS);
 
-        // Check if the user already exists using the executeQuery utility function
-        const userExists = await usersModel.getUserByEmail(email);
+        const salt = await bcrypt.genSalt(parseInt(SALT_ROUNDS));
 
-        if (userExists.length > 0) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Insert the new user using the executeQuery utility function
-        const newUserRows = await usersModel.addUser(username, email, hashedPassword)
+        const newUser = await usersModel.createUser(firstName, lastName, username, email, hashedPassword);
 
-        // Assuming executeQuery returns the rows directly, we can directly access the first row
-        const newUser = newUserRows[0];
+        const accessToken = jwt.sign({ id: newUser[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: EXPIRES_IN });
+        const refreshToken = jwt.sign({ id: newUser[0].user_id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 
-        // Exclude password from the response
-        const { password: _, ...userWithoutPassword } = newUser;
-        console.log(newUser);
-        res.status(201).json({ user: userWithoutPassword });
+
+        sendResponse(res, 201, { id: id, accessToken: accessToken, refreshToken: refreshToken }, "User created successfully. Welcome!");
     }),
-
     login: catchAsync(async (req, res) => {
         const { email, password } = req.body;
     
-        // Check if the user exists
-        const userRows = await usersModel.getUserByEmail(email);
-        if (userRows.length === 0) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+        const user = await usersModel.getUserByEmail(email);
+
+        if (user.length === 0) {
+            return sendResponse(res, 401, null, "Account not Found");
         }
-        const user = userRows[0];
-        // console.log(user);
     
-        // Compare the provided password with the stored hashed password
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user[0].password);
+
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return sendResponse(res, 401, null, "Email or Password are incorrect");
         }
-        
-        // Successful login, set up session
-        req.session.authenticated = true;
-        req.session.user = { id: user.user_id, email: user.email }; // Store essential user info, avoid storing sensitive info
-        console.log(req.session.user)
-        // Respond to the client
-        const { password: _, ...userWithoutPassword } = user; // Exclude password from the response
-        res.json({
-            message: 'Login successful',
-            user: userWithoutPassword
-        })
-    },
-    ),
-    sesh: catchAsync(async (req, res) => {
-        const sessionData = req.session.user;
-        res.json({ data: sessionData });
+
+        const accessToken = jwt.sign({ id: user[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
+        const refreshToken = jwt.sign({ id: user[0].user_id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+
+        sendResponse(res, 200, { id: user[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "Login successful");
+    }),
+    updateProfile: catchAsync(async (req, res) => {
+        const { id } = req.user;
+        const { nFirstName, nLastName, nUsername, nEmail, nProfilePicture, nLocation, nPrefLang } = req.body;
+
+        const updatedUser = await usersModel.updateUser(nFirstName, nLastName, nUsername, nEmail, nProfilePicture, nLocation, nPrefLang, id);
+
+        sendResponse(res, 200, null, "Profile updated successfully");
+    }),
+    refreshToken: catchAsync(async (req, res) => {
+        const { id } = req.user;
+
+        const refreshToken = jwt.sign({ id: id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+
+        sendResponse(res, 200, { refreshToken: refreshToken }, "Profile updated successfully");
     })
-    
-
-
-
-
 }
 
 
