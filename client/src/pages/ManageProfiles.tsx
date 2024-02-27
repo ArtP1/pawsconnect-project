@@ -20,8 +20,13 @@ export const ManageProfiles = () => {
   const [nLocation, setLocation] = useState('');
   const [nPrefLang, setPrefLang] = useState('');
 
+  // Pet Information
+  const [petImage, setPetImage] = useState('');
+  const [petName, setPetName] = useState('');
+
   // Others
   const [error, setError] = useState('');
+  const [petError, setPetError] = useState('');
   const authHeader = useAuthHeader();
 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false); // State to control the visibility of SuccessAlert
@@ -58,7 +63,31 @@ export const ManageProfiles = () => {
     }
   }
 
+  const handlePetRetrieval = async () => {
+    try {
+      const response = await fetch("/api/users/pets", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${authHeader}`
+        }
+      });
 
+      if(response.ok) {
+        const resp = await response.json();
+
+        setPetName(resp.data.pets[0].name);
+        setPetImage(resp.data.pets[0].profile_pic)
+      } else {
+        const errorData = await response.json();
+        setPetError(errorData.message || '')
+      }
+    } catch(err) {
+        setPetError("Network Error");
+    }
+  }
+
+  
   const handlePrefill = async () => {
     try {
       const response = await fetch("/api/users/profile", {
@@ -91,6 +120,7 @@ export const ManageProfiles = () => {
 
   useEffect(() => {
     handlePrefill();
+    handlePetRetrieval();
   }, []);
 
   return (
@@ -193,21 +223,20 @@ export const ManageProfiles = () => {
               <div className='grid grid-cols-3 gap-4 w-full'>
               <Card className="w-full max-w-md">
                 <CardHeader>
-                  <CardTitle>Fluffy</CardTitle>
+                  <CardTitle>{petName}</CardTitle>
                   <CardDescription>Golden Retriever, 5 years old</CardDescription>
                 </CardHeader>
                 <CardContent className="flex justify-center items-center">
                   <img
                     alt="Pet"
-                    className="rounded-full w-50 h-50"
-                    height="200"
-                    src="/placeholder.svg"
+                    className="object-cover w-50 h-50"
+                    height="300"
+                    src={petImage}
                     style={{
-                      aspectRatio: "200/200",
+                      aspectRatio: "300/300",
                       objectFit: "cover",
                     }}
-                    width="200"
-                  />
+                    width="300"/>
                 </CardContent>
                 <CardFooter>
                   <Button className="ml-auto" variant="outline">

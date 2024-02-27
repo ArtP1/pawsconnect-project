@@ -70,7 +70,7 @@ export function SignUpPage() {
         
         console.log(error);
 
-        if(error.data.length > 0) {
+        if(error.data != null) {
           error.data.forEach((err: InputError) => {
 
             switch(err.path) {

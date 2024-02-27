@@ -14,6 +14,7 @@ router.post('/login', loginLimiter, usersController.login);
 // Accessible to Members only
 router.get('/profile', isAuthenticated, usersController.getUserById);
 router.post('/profile/update', isAuthenticated, usersController.updateProfile);
+router.get('/pets', isAuthenticated, usersController.getUserPets);
 
 // Used to refresh JWT token 
 router.post('/refresh', isAuthenticated, usersController.refreshToken);

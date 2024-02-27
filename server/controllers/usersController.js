@@ -32,7 +32,6 @@ const usersController = {
     }),
     signup: catchAsync(async (req, res) => {
         const { firstName, lastName, username, email, password } = req.body;
-        parseInt(SALT_ROUNDS);
 
         const salt = await bcrypt.genSalt(parseInt(SALT_ROUNDS));
 
@@ -40,17 +39,16 @@ const usersController = {
 
         const newUser = await usersModel.createUser(firstName, lastName, username, email, hashedPassword);
 
-        const accessToken = jwt.sign({ id: newUser[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: EXPIRES_IN });
+        const accessToken = jwt.sign({ id: newUser[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
         const refreshToken = jwt.sign({ id: newUser[0].user_id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 
-
-        sendResponse(res, 201, { id: id, accessToken: accessToken, refreshToken: refreshToken }, "User created successfully. Welcome!");
+        sendResponse(res, 201, { id: newUser[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "User created successfully. Welcome!");
     }),
     login: catchAsync(async (req, res) => {
         const { email, password } = req.body;
-    
-        const user = await usersModel.getUserByEmail(email);
 
+        const user = await usersModel.getUserByEmail(email);
+        
         if (user.length === 0) {
             return sendResponse(res, 401, null, "Account not Found");
         }
@@ -73,6 +71,13 @@ const usersController = {
         const updatedUser = await usersModel.updateUser(nFirstName, nLastName, nUsername, nEmail, nProfilePicture, nLocation, nPrefLang, id);
 
         sendResponse(res, 200, null, "Profile updated successfully");
+    }),
+    getUserPets: catchAsync(async (req, res) => {
+        const { id } = req.user;
+        
+        const pets = await usersModel.getUserPets(id);
+
+        sendResponse(res, 200, { pets }, "Uet pets retrieved successfully");
     }),
     refreshToken: catchAsync(async (req, res) => {
         const { id } = req.user;

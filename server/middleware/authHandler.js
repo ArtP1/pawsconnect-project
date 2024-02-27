@@ -1,7 +1,7 @@
 const logger = require('../config/logging');
 const jwt = require('jsonwebtoken');
 const { sendResponse } = require('../config/responseHandler');
-const { SECRET_KEY } = require('../config/configs').security;
+const { ACCESS_TOKEN_SECRET } = require('../config/configs').security;
 
 
 const isAuthenticated = (req, res, next) => {
@@ -12,7 +12,7 @@ const isAuthenticated = (req, res, next) => {
             token = token.slice(7, token.length);
         }
 
-        jwt.verify(token, SECRET_KEY, (err, decoded) => {
+        jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
             if (err) {
                 logger.error(`Token verification failed: ${err.message}`);
                 return sendResponse(res, 401, null, "Invalid token");
