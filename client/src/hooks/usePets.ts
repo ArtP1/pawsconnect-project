@@ -12,8 +12,13 @@ export const usePets = () => {
   useEffect(() => {
     const fetchPets = async () => {
       setLoading(true);
-      const pets = await petsService.getPets();
-      setPets(pets);
+      
+      const resp = await petsService.getPets();
+
+      if (resp.success) {
+        setPets(resp.data.pets);
+      }
+      
       setLoading(false);
     };
 

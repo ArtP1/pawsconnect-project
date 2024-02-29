@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
 const usersController = {
     getUsers: catchAsync(async (req, res) => {
         const users = await usersModel.getUsers();
-        sendResponse(res, 200, users, "Users retrieved successfully");
+        sendResponse(res, 200, true, users, "Users retrieved successfully");
     }),
     getUserById: catchAsync(async (req, res) => {
         const { id } = req.user;
@@ -20,17 +20,18 @@ const usersController = {
         const {password, ...userWithoutPassword} = user;
 
         if(!user) {
-            return sendResponse(res, 404, {}, "User not found");
+            return sendResponse(res, 404, false, {}, "User not found");
         }
 
-        sendResponse(res, 200, userWithoutPassword, "User retrieved successfully");
+        sendResponse(res, 200, true, userWithoutPassword, "User retrieved successfully");
     }),
     getUserFriendsById: catchAsync(async (req, res) => {
         const { id } = req.params;
         const userFriends = await usersModel.getUserFriendsById(id);
-        sendResponse(res, 200, userFriends, "User friends retrieved succesfully");
+        sendResponse(res, 200, true, userFriends, "User friends retrieved succesfully");
     }),
     signup: catchAsync(async (req, res) => {
+        // This method doesn't require error handling as the 'userValidation' middelware takes care of it
         const { firstName, lastName, username, email, password } = req.body;
 
         const salt = await bcrypt.genSalt(parseInt(SALT_ROUNDS));
@@ -42,7 +43,7 @@ const usersController = {
         const accessToken = jwt.sign({ id: newUser[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
         const refreshToken = jwt.sign({ id: newUser[0].user_id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 
-        sendResponse(res, 201, { id: newUser[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "User created successfully. Welcome!");
+        sendResponse(res, 201, true,  { id: newUser[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "User created successfully. Welcome!");
     }),
     login: catchAsync(async (req, res) => {
         const { email, password } = req.body;
@@ -50,41 +51,72 @@ const usersController = {
         const user = await usersModel.getUserByEmail(email);
         
         if (user.length === 0) {
-            return sendResponse(res, 401, null, "Account not Found");
+            return sendResponse(res, 401, false, null, "Account doesn't exist");
         }
     
         const isMatch = await bcrypt.compare(password, user[0].password);
 
         if (!isMatch) {
-            return sendResponse(res, 401, null, "Email or Password are incorrect");
+            return sendResponse(res, 401, false, null, "Incorrect email or password");
         }
 
         const accessToken = jwt.sign({ id: user[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
         const refreshToken = jwt.sign({ id: user[0].user_id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 
-        sendResponse(res, 200, { id: user[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "Login successful");
+        sendResponse(res, 200, true, { id: user[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "Login successful. Welcome back!");
     }),
     updateProfile: catchAsync(async (req, res) => {
         const { id } = req.user;
-        const { nFirstName, nLastName, nUsername, nEmail, nProfilePicture, nLocation, nPrefLang } = req.body;
+        const { nFirstName, nLastName, nEmail, nProfilePicture, nLocation, nPrefLang } = req.body;
 
-        const updatedUser = await usersModel.updateUser(nFirstName, nLastName, nUsername, nEmail, nProfilePicture, nLocation, nPrefLang, id);
+        const updatedUser = await usersModel.updateUser(nFirstName, nLastName, nEmail, nProfilePicture, nLocation, nPrefLang, id);
 
-        sendResponse(res, 200, null, "Profile updated successfully");
+        if(!updatedUser) {
+            return sendResponse(res, 200, false, null, "Profile failed to update profile. If the problem persists, contact support for assistance.");
+        }
+        
+        sendResponse(res, 200, true, null, "Profile updated successfully");
     }),
     getUserPets: catchAsync(async (req, res) => {
         const { id } = req.user;
         
         const pets = await usersModel.getUserPets(id);
 
-        sendResponse(res, 200, { pets }, "Uet pets retrieved successfully");
+        if(pets.length == 0) {
+            return sendResponse(res, 200, false, null, "No pets found for the user");
+        }
+
+        sendResponse(res, 200, true, { pets }, "User pets retrieved successfully");
+    }),
+    updateUserPet: catchAsync(async (req, res) => {
+        const { name, } = req.body;
+
+        const updatedPet = await usersModel.updateUserPet(petId);
+
+        if(!updatedPet) {
+            return sendResponse(res, 404, false, {}, "Pet not found or update failed.");
+        }
+
+        sendResponse(res, 200, true, updatedPet, "Pet updated successfully.");
+    }),
+    deleteUserPet: catchAsync(async (req, res) => {
+        const { petId } = req.query;
+
+        const deletedPet = await usersModel.deleteUserPet(petId);
+
+        if(!deletedPet) {
+            return sendResponse(res, 200, false, null, "User pet failed to be deleted. If the problem persists, contact support for assistance.");
+        }
+
+        sendResponse(res, 200, true, null, "User pet deleted successfully");
     }),
     refreshToken: catchAsync(async (req, res) => {
         const { id } = req.user;
 
+        // No need to do error checks, the middleware takes care of this one
         const refreshToken = jwt.sign({ id: id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 
-        sendResponse(res, 200, { refreshToken: refreshToken }, "Profile updated successfully");
+        sendResponse(res, 200, true, { refreshToken: refreshToken }, "Profile updated successfully");
     })
 }
 

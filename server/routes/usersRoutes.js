@@ -1,7 +1,7 @@
 const express = require('express');
 const usersController = require('../controllers/usersController');
 const router = express.Router();
-const { validateUserSignup } = require('../middleware/validation/userValidation');
+const { validateUserSignup, validateUserProfileUpdate } = require('../middleware/validation/userValidation');
 const loginLimiter = require('../middleware/rateLimit');
 const { isAuthenticated } = require('../middleware/authHandler');
 
@@ -13,10 +13,17 @@ router.post('/login', loginLimiter, usersController.login);
 
 // Accessible to Members only
 router.get('/profile', isAuthenticated, usersController.getUserById);
+
+// Middleware order matters, in this instance we first check that the user is authenticated, and then we perform the validation
+// router.post('/profile/update', isAuthenticated, validateUserProfileUpdate, usersController.updateProfile);
 router.post('/profile/update', isAuthenticated, usersController.updateProfile);
+
 router.get('/pets', isAuthenticated, usersController.getUserPets);
+router.get('/pets/delete', isAuthenticated, usersController.deleteUserPet);
+router.post('/pets/update', isAuthenticated, usersController.updateUserPet)
 
 // Used to refresh JWT token 
 router.post('/refresh', isAuthenticated, usersController.refreshToken);
+
 
 module.exports = router;

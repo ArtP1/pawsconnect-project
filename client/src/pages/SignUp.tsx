@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
+import useUser from '@/hooks/useUsers';
 
 interface InputError {
   type: string,
@@ -14,9 +15,11 @@ interface InputError {
   location: string
 }
 
+
 interface IUserData {
   id: string;
 };
+
 
 export function SignUpPage() {
   const [firstName, setFirstName] = useState('');
@@ -32,76 +35,59 @@ export function SignUpPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const signIn = useSignIn<IUserData>();
+  const { signup } = useUser();
+
 
   const handleSignUp = async (e: { preventDefault: () => void; }) => { // preventDefault, makes sure the form is not submitted if blank
     e.preventDefault();
 
-    try {
-      const response = await fetch("/api/users/signup", { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    const resp = await signup({ first_name: firstName, last_name: lastName, username, email, password });
+
+    setFirstNameError('');
+    setLastNameError('');
+    setUsernameError('');
+    setEmailError('');
+    setPasswordError('');
+    setError('');
+
+    if (resp && resp.success) {
+
+      signIn({
+        auth: {
+          token: resp.data.accessToken,
+          type: "Bearer"
         },
-        body: JSON.stringify({ firstName, lastName, username, email, password })
+        userState: { id: resp.data.id },
+        refresh: resp.data.refreshToken
       });
 
-      setFirstNameError('');
-      setLastNameError('');
-      setUsernameError('');
-      setEmailError('');
-      setPasswordError('');
-      setError('');
+      navigate('/');
 
-      if (response.ok) {
-        const resp = await response.json();
+    } else if (resp) {
 
-        signIn({
-          auth: {
-            token: resp.data.accessToken,
-            type: "Bearer"
-          },
-          userState: { id: resp.data.id },
-          refresh: resp.data.refreshToken
-        });
+      resp.data.forEach((err: InputError) => {
 
-        navigate('/'); 
-      } else {
-        const error = await response.json();
-        
-        console.log(error);
-
-        if(error.data != null) {
-          error.data.forEach((err: InputError) => {
-
-            switch(err.path) {
-              case 'firstName':
-                setFirstNameError(err.msg);
-                break;
-              case 'lastName':
-                setLastNameError(err.msg);
-                break;
-              case 'username':
-                setUsernameError(err.msg);
-                break;
-              case 'email':
-                setEmailError(err.msg);
-                break;
-              case 'password':
-                setPasswordError(err.msg);
-                break;
-              default:
-                break;
-            }
-
-          });
-
-        } else {
-          setError("Failed to sign up");
+        switch (err.path) {
+          case 'firstName':
+            setFirstNameError(err.msg);
+            break;
+          case 'lastName':
+            setLastNameError(err.msg);
+            break;
+          case 'username':
+            setUsernameError(err.msg);
+            break;
+          case 'email':
+            setEmailError(err.msg);
+            break;
+          case 'password':
+            setPasswordError(err.msg);
+            break;
+          default:
+            break;
         }
-      }
-    } catch (err) {
-      console.error(err); // This will give you more insight into the error
-      setError("Network error");
+
+      });
     }
   };
 
@@ -135,48 +121,48 @@ export function SignUpPage() {
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-2">
                 <Label className="text-blue-600 dark:text-green-400" htmlFor="first-name">First name</Label>
-                <Input 
-                  className="text-gray-600 dark:text-gray-400" 
-                  id="first-name" 
-                  placeholder="Lee" 
-                  value={firstName} 
-                  onChange={(e) => setFirstName(e.target.value)} 
+                <Input
+                  className="text-gray-600 dark:text-gray-400"
+                  id="first-name"
+                  placeholder="Lee"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   required
-                  type='text'/>
+                  type='text' />
               </div>
-            
+
               <div className="space-y-2" >
                 <Label className="text-blue-600 dark:text-green-400" htmlFor="last-name">Last name</Label>
-                <Input 
-                  className="text-gray-600 dark:text-gray-400" 
+                <Input
+                  className="text-gray-600 dark:text-gray-400"
                   id="last-name"
                   placeholder="Robinson"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  required 
-                  type='text'/>
+                  required
+                  type='text' />
               </div>
 
-              { (firstNameError && lastNameError) ? 
+              {(firstNameError && lastNameError) ?
                 <div className="col-span-2 text-red-400 text-sm">* Both names must be alphabetical characters</div> :
                 (firstNameError) ?
                   <div className="col-span-2 text-red-400 text-sm">* {firstNameError}</div> :
-                    <div className="col-span-2 text-red-400 text-sm">* {lastNameError}</div>}
+                  <div className="col-span-2 text-red-400 text-sm">* {lastNameError}</div>}
 
             </div>
             <div className="space-y-2">
-                <Label className="text-blue-600 dark:text-green-400" htmlFor="username">Username</Label>
-                <Input 
-                  className="text-gray-600 dark:text-gray-400" 
-                  id="username"
-                  placeholder="leeRob123"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required 
-                  type='text'/>
+              <Label className="text-blue-600 dark:text-green-400" htmlFor="username">Username</Label>
+              <Input
+                className="text-gray-600 dark:text-gray-400"
+                id="username"
+                placeholder="leeRob123"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                type='text' />
             </div>
-            
-            { usernameError && <div className="text-red-400 text-sm">* {usernameError}</div> }
+
+            {usernameError && <div className="text-red-400 text-sm">* {usernameError}</div>}
 
             <div className="space-y-2">
               <Label className="text-blue-600 dark:text-green-400" htmlFor="email">Email</Label>
@@ -187,23 +173,23 @@ export function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                type="email"/>
+                type="email" />
             </div>
 
             {emailError && <div className="text-red-400 text-sm">* {emailError}</div>}
 
             <div className="space-y-2">
               <Label className="text-blue-600 dark:text-green-400" htmlFor="password">Password</Label>
-              <Input 
+              <Input
                 className="text-gray-600 dark:text-gray-400"
-                id="password" 
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required 
-                type="password"/>
+                required
+                type="password" />
             </div>
 
-            { (error || passwordError) && <div className="text-red-500 text-sm">{error || passwordError}</div> }
+            {(error || passwordError) && <div className="text-red-500 text-sm">{error || passwordError}</div>}
 
             <Button className="w-full bg-blue-600 text-white dark:bg-green-400" type="submit">Sign Up</Button>
 
