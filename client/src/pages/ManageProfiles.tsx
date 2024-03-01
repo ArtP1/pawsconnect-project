@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent} from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -20,9 +20,9 @@ export const ManageProfiles = () => {
   // Necessary imports
   const {
     userProfile, userPets, updateProfile, deletePet, loading, error, success, isAlert
-  } = useUser(`${authHeader}`); 
+  } = useUser(`${authHeader}`);
 
-  
+
   const [profilePicture, setProfilePicture] = useState('');
   const [firstName, setFirstName] = useState('');
   const [username, setUsername] = useState('');
@@ -34,12 +34,12 @@ export const ManageProfiles = () => {
 
   useEffect(() => { // handles user profile prefill
     if (userProfile) {
-      setProfilePicture(userProfile.profile_pic|| '');
-      setFirstName(userProfile.first_name|| '');
-      setLastName(userProfile.last_name|| '');
-      setUsername(userProfile.username|| '');
-      setEmail(userProfile.email|| '');
-      setLocation(userProfile.location|| '');
+      setProfilePicture(userProfile.profile_pic || '');
+      setFirstName(userProfile.first_name || '');
+      setLastName(userProfile.last_name || '');
+      setUsername(userProfile.username || '');
+      setEmail(userProfile.email || '');
+      setLocation(userProfile.location || '');
       setPrefLang(userProfile.preferred_lang || '');
     }
   }, [userProfile]);
@@ -47,10 +47,10 @@ export const ManageProfiles = () => {
 
   return (
     <div key="1" className="flex flex-col gap-4 p-10">
-      
+
       {error && isAlert && <DynamicAlert type="error" title="Error" description={error} />}
       {success && isAlert && <DynamicAlert type="success" title="Success" description={success} />}
-      
+
       <main className="flex flex-col gap-4">
         <Tabs className="w-full" defaultValue="profile">
           <TabsList className="grid w-full grid-cols-2">
@@ -81,10 +81,10 @@ export const ManageProfiles = () => {
                     </DialogHeader>
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                       <Label htmlFor="picture">Picture</Label>
-                      <Input 
-                        accept="image/*" 
-                        id="picture" 
-                        type="file"/>
+                      <Input
+                        accept="image/*"
+                        id="picture"
+                        type="file" />
                     </div>
                     <DialogFooter>
                       <Button className="ml-auto">Upload</Button>
@@ -130,8 +130,8 @@ export const ManageProfiles = () => {
                     placeholder="Enter an email"
                     type="email"
                     onChange={(e) => setEmail(e.target.value)}
-                    value={email} 
-                    />
+                    value={email}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -156,32 +156,54 @@ export const ManageProfiles = () => {
 
                 <div className="flex justify-end space-x-2">
                   <Button variant="outline">Cancel</Button>
-                  <Button 
+                  <Button
                     onClick={() => updateProfile({
-                                       nProfilePicture: profilePicture, 
-                                       nFirstName: firstName, 
-                                       nLastName: lastName, 
-                                       nEmail: email,
-                                       nLocation: location,
-                                       nPrefLang: prefLang
-                                   })}>
+                      nProfilePicture: profilePicture,
+                      nFirstName: firstName,
+                      nLastName: lastName,
+                      nEmail: email,
+                      nLocation: location,
+                      nPrefLang: prefLang
+                    })}>
                     Save
                   </Button>
                 </div>
               </form>
             </div>
           </TabsContent>)}
-          
-          
+
+
 
           {/* Pets tab */}
           <TabsContent className='flex justify-center items-center flex-col w-full' value="pets">
-            <div className="flex flex-wrap gap-4 w-4/5 ">
-              <div className='grid grid-cols-3 gap-4 w-full'>
+            <div className="flex flex-wrap gap-4 w-4/5 justify-center">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="default" 
+                    size="sm">
+                    Add New Pet
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Add New Pet</DialogTitle>
+                    <DialogDescription>Enter your new pet's details.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    {/* Form fields for new pet details */}
+                    {/* Implement onChange handlers and value bindings similar to existing fields */}
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={() => {/* handle adding new pet */ }}>Add Pet</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
 
+              <div className='grid grid-cols-3 gap-10 w-full'>
                 {/* Loops through the list of pets and assigns each a Card and other components */}
                 {userPets.map((pet, index) => (
-                  <Card key={index} className="w-full max-w-md">
+                  <Card key={index} className="w-full max-w-sm shadow-lg">
                     <CardHeader>
                       <CardTitle>{pet.name}</CardTitle>
                       <CardDescription>{pet.breed}, {pet.age} years old</CardDescription>
@@ -190,10 +212,10 @@ export const ManageProfiles = () => {
                       <img
                         alt="Pet"
                         src={pet.profile_pic}
-                        className="max-w-full h-auto max-h-72"/>
+                        className="w-48 h-48 object-cover" />
                     </CardContent>
 
-                    <CardFooter className='flex justify-evenly'>
+                    <CardFooter className='flex justify-evenly mb-2'>
 
                       {/* Delete Pet Button & Alert Dialog */}
                       <Dialog>
@@ -210,52 +232,52 @@ export const ManageProfiles = () => {
                               <Label className="text-right" htmlFor="name">
                                 Name
                               </Label>
-                              <Input 
-                                className="col-span-3" 
-                                id="name" 
-                                value={pet.name}/>
+                              <Input
+                                className="col-span-3"
+                                id="name"
+                                value={pet.name} />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label className="text-right" htmlFor="name">
                                 Age
                               </Label>
-                              <Input 
-                                className="col-span-3" 
-                                id="name" 
-                                value={pet.age} 
-                                type='number' 
-                                min="0" 
-                                max="20"/>
+                              <Input
+                                className="col-span-3"
+                                id="name"
+                                value={pet.age}
+                                type='number'
+                                min="0"
+                                max="20" />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label className="text-right" htmlFor="profile-picture">Profile Picture</Label>
                               <div className="col-span-3">
-                                <Input id="profile-picture" 
+                                <Input id="profile-picture"
                                   type="file"
-                                  className='cursor-pointer'/>
+                                  className='cursor-pointer' />
                               </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label className="text-right" htmlFor="description">Description</Label>
-                              <Textarea 
-                                className="col-span-3" 
-                                id="description" 
+                              <Textarea
+                                className="col-span-3"
+                                id="description"
                                 value={pet.description} />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label className="text-right" htmlFor="breed">Breed</Label>
-                              <Input 
-                                className="col-span-3" 
-                                id="breed" 
+                              <Input
+                                className="col-span-3"
+                                id="breed"
                                 value={pet.breed} />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label className="text-right" htmlFor="color">
                                 Color
                               </Label>
-                              <Input 
-                                className="col-span-3" 
-                                id="color" 
+                              <Input
+                                className="col-span-3"
+                                id="color"
                                 value={pet.color} />
                             </div>
                           </div>
@@ -268,11 +290,11 @@ export const ManageProfiles = () => {
                       {/* Delete Pet Button & Alert Dialog */}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button 
+                          <Button
                             variant="destructive"
-                            className='shadow-lg' 
+                            className='shadow-lg'
                             size='sm'>
-                              Delete Pet
+                            Delete Pet
                           </Button>
                         </AlertDialogTrigger>
 
@@ -292,7 +314,6 @@ export const ManageProfiles = () => {
                     </CardFooter>
                   </Card>
                 ))}
-
               </div>
             </div>
           </TabsContent>

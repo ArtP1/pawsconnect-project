@@ -26,8 +26,9 @@ const signupUser = async (body: UserSignUp): Promise<ApiResponse> => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ first_name, 
-            last_name, 
+        body: JSON.stringify({ 
+            firstName: first_name, 
+            lastName: last_name, 
             username, 
             email, 
             password 
