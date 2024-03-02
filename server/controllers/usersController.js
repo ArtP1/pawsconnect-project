@@ -89,9 +89,9 @@ const usersController = {
         sendResponse(res, 200, true, { pets }, "User pets retrieved successfully");
     }),
     updateUserPet: catchAsync(async (req, res) => {
-        const { name, } = req.body;
+        const { petId, nName, nAge, nProfilePic, nDescription, nBreed, nColor } = req.body;
 
-        const updatedPet = await usersModel.updateUserPet(petId);
+        const updatedPet = await usersModel.updateUserPet(nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId);
 
         if(!updatedPet) {
             return sendResponse(res, 404, false, {}, "Pet not found or update failed.");

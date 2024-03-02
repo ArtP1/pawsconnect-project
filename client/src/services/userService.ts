@@ -96,7 +96,7 @@ const updateUserProfile = async (authHeader: string, body: UserProfileUpdateBody
 
 
 const updateUserPet = async (authHeader: string, body: PetProfileUpdateBody): Promise<ApiResponse> => {
-    const { nName, nAge, nProfilePic, nDescription, nBreed, nColor } = body;
+    const { petId, nName, nAge, nProfilePic, nDescription, nBreed, nColor } = body;
 
     const response = await fetch(`/api/users/pets/update`, {
         method: 'POST',
@@ -105,6 +105,7 @@ const updateUserPet = async (authHeader: string, body: PetProfileUpdateBody): Pr
             'Authorization': authHeader
         },
         body: JSON.stringify({
+            petId,
             nName,
             nAge,
             nProfilePic,

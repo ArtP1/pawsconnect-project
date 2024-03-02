@@ -2,14 +2,15 @@
 interface Pet { 
   pet_id: string;
   name: string;
+  age: number;
   profile_pic: string;
   description: string;
   breed: string;
   color: string;
-  age: number;
 }
 
 interface PetProfileUpdateBody {
+  petId: string,
   nName: string;
   nAge: number;
   nProfilePic: string;

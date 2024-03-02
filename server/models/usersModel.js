@@ -55,13 +55,13 @@ const usersModel = {
         const result = await executeQuery(`DELETE FROM \"pets\" WHERE pet_id = $1 RETURNING *`, [petId]);
         return result.length > 0;
     },
-    updateUserPet: async(petId) => {
-        const result = await executeQuery(`UPDATE \"pets\" name = $1, age = $2, profile_pic = $3, description = $4, breed = $5, 
-                                           color = $6 WHERE pet_id = $7`, [petId]);
+    updateUserPet: async(nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId) => {
+        const result = await executeQuery(`UPDATE \"pets\" SET name = $1, age = $2, profile_pic = $3, description = $4, breed = $5, 
+                                           color = $6 WHERE pet_id = $7 RETURNING *`, [nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId]);
         return result.length > 0;
     },
     getUserPets: async(id) => {
-        return await executeQuery('SELECT * FROM \"pets\" WHERE owner_id = $1', [id]);
+        return await executeQuery('SELECT pet_id, name, age, profile_pic, description, breed, color FROM \"pets\" WHERE owner_id = $1', [id]);
     }
 }
 

@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import useUser from "@/hooks/useUsers";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { DynamicAlert } from "@/components/component/dynamic-alert";
+import { Pet } from "@/models/petModel";
 
 export const ManageProfiles = () => {
   const authHeader = useAuthHeader();
@@ -50,6 +51,7 @@ export const ManageProfiles = () => {
     error,
     success,
     isAlert,
+    updatePet,
   } = useUser(`${authHeader}`);
 
   const [profilePicture, setProfilePicture] = useState("");
@@ -59,6 +61,14 @@ export const ManageProfiles = () => {
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
   const [prefLang, setPrefLang] = useState("");
+
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [petName, setPetName] = useState("");
+  const [petAge, setPetAge] = useState(0);
+  const [petProfilePicture, setPetProfilePicture] = useState("");
+  const [petDescription, setPetDescription] = useState("");
+  const [petBreed, setPetBreed] = useState("");
+  const [petColor, setPetColor] = useState("");
 
   useEffect(() => {
     // handles user profile prefill
@@ -71,16 +81,88 @@ export const ManageProfiles = () => {
       setLocation(userProfile.location || "");
       setPrefLang(userProfile.preferred_lang || "");
     }
-    console.log(profilePicture);
   }, [userProfile]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Source: https://www.youtube.com/watch?v=2okUvC2qBWk
+  const compressImage = (imageDataUrl: string): Promise<string> => {
+    const maxWidth = 200;
+    const maxHeight = 200;
+    const quality = 0.7;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+        resolve(compressedDataUrl);
+      };
+
+      img.onerror = (error) => {
+        reject(error);
+      };
+
+      img.src = imageDataUrl;
+    });
+  };
+
+  const handleUserPFPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePicture(reader.result as string);
+        const imageDataUrl = reader.result as string;
+
+        compressImage(imageDataUrl)
+          .then((compressedDataUrl) => {
+            setProfilePicture(compressedDataUrl);
+          })
+          .catch((error) => {
+            console.error("Error compressing image:", error);
+          });
       };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePetPFPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result as string;
+
+        compressImage(imageDataUrl)
+          .then((compressedDataUrl) => {
+            setPetProfilePicture(compressedDataUrl);
+          })
+          .catch((error) => {
+            console.error("Error compressing image:", error);
+          });
+      };
+
       reader.readAsDataURL(file);
     }
   };
@@ -115,7 +197,11 @@ export const ManageProfiles = () => {
                   <div className="flex items-center justify-center mt-4">
                     <Label htmlFor="picture">
                       <Avatar className="h-32 w-32 cursor-pointer">
-                        <AvatarImage alt="User Profile" src={profilePicture} />
+                        <AvatarImage
+                          alt="User Profile"
+                          src={profilePicture}
+                          className="object-cover"
+                        />
                         <AvatarFallback>
                           {firstName && firstName.length > 0
                             ? firstName[0].toUpperCase()
@@ -131,14 +217,28 @@ export const ManageProfiles = () => {
                       id="picture"
                       type="file"
                       style={{ display: "none" }}
-                      onChange={handleFileChange}/>
+                      onChange={handleUserPFPChange}
+                    />
                   </div>
                 </div>
 
                 {/* Username display */}
                 {username && `@${username}`}
 
-                <form id="profileForm" className="mt-4 space-y-4">
+                <form 
+                  id="profileForm" 
+                  className="mt-4 space-y-4"
+                  onSubmit={() =>
+                    updateProfile({
+                      nProfilePicture: profilePicture,
+                      nFirstName: firstName,
+                      nLastName: lastName,
+                      nEmail: email,
+                      nLocation: location,
+                      nPrefLang: prefLang,
+                    })
+                  }
+                >
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
                       <Label className="text-blue-600" htmlFor="first-name">
@@ -179,6 +279,7 @@ export const ManageProfiles = () => {
                       id="email"
                       placeholder="Enter an email"
                       type="email"
+                      required
                       onChange={(e) => setEmail(e.target.value)}
                       value={email}
                     />
@@ -212,18 +313,7 @@ export const ManageProfiles = () => {
 
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline">Cancel</Button>
-                    <Button
-                      onClick={() =>
-                        updateProfile({
-                          nProfilePicture: profilePicture,
-                          nFirstName: firstName,
-                          nLastName: lastName,
-                          nEmail: email,
-                          nLocation: location,
-                          nPrefLang: prefLang,
-                        })
-                      }
-                    >
+                    <Button type="submit">
                       Save
                     </Button>
                   </div>
@@ -293,95 +383,170 @@ export const ManageProfiles = () => {
                             size="sm"
                             className="shadow-lg"
                             variant="outline"
+                            onClick={() => {
+                              setSelectedPet(pet);
+                              setPetName(pet.name);
+                              setPetAge(pet.age);
+                              setPetProfilePicture(pet.profile_pic);
+                              setPetDescription(pet.description);
+                              setPetBreed(pet.breed);
+                              setPetColor(pet.color);
+                            }}
                           >
                             Edit Pet
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-lg">
-                          <DialogHeader>
-                            <DialogTitle>Edit Pet</DialogTitle>
-                            <DialogDescription>
-                              Make changes to your pet's profile here. Click
-                              save when you're done.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label className="text-right" htmlFor="name">
-                                Name
-                              </Label>
-                              <Input
-                                className="col-span-3"
-                                id="name"
-                                value={pet.name}
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label className="text-right" htmlFor="name">
-                                Age
-                              </Label>
-                              <Input
-                                className="col-span-3"
-                                id="name"
-                                value={pet.age}
-                                type="number"
-                                min="0"
-                                max="20"
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label
-                                className="text-right"
-                                htmlFor="profile-picture"
-                              >
-                                Profile Picture
-                              </Label>
-                              <div className="col-span-3">
-                                <Input
-                                  id="profile-picture"
-                                  type="file"
-                                  className="cursor-pointer"
-                                />
+                          
+                        {/* If a pet is selected to be edited, prefill data, otherwise neglect */}
+                        {selectedPet && (
+                          <DialogContent className="max-w-lg">
+                            <DialogHeader>
+                              <DialogTitle>Edit Pet</DialogTitle>
+                              <DialogDescription>
+                                Make changes to your pet's profile here. Click
+                                save when you're done.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <form id="editPetForm"
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                updatePet({
+                                  petId: selectedPet.pet_id,
+                                  nName: petName,
+                                  nAge: petAge,
+                                  nProfilePic: petProfilePicture,
+                                  nDescription: petDescription,
+                                  nBreed: petBreed,
+                                  nColor: petColor,
+                              });
+                            }}>
+                              <div className="grid gap-4 py-4">
+                                <div className="flex items-center justify-center mb-5">
+                                  <div className="flex items-center justify-center">
+                                    <Label htmlFor="picture">
+                                      <Avatar className="h-13 w-13 cursor-pointer">
+                                        <AvatarImage
+                                          alt="User Profile"
+                                          src={petProfilePicture}
+                                          className="object-cover bg-cover"
+                                          style={{ width: '180px', height: '180px' }}
+                                        />
+                                        <AvatarFallback>
+                                          N/A
+                                        </AvatarFallback>
+                                      </Avatar>
+                                    </Label>
+                                    <Input
+                                      accept="image/*"
+                                      id="picture"
+                                      type="file"
+                                      style={{ display: "none" }}
+                                      onChange={handlePetPFPChange}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="name">
+                                    Name
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="name"
+                                    onChange={(e) => setPetName(e.target.value)}
+                                    value={petName}
+                                    required
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="name">
+                                    Age
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="name"
+                                    value={petAge}
+                                    type="number"
+                                    min="0"
+                                    max="20"
+                                    required
+                                    onChange={(e) => setPetAge(parseInt(e.target.value))}
+                                  />
+                                </div>
+
+                                {/* <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label
+                                    className="text-right"
+                                    htmlFor="profile-picture"
+                                  >
+                                    Profile Picture
+                                  </Label>
+                                  <div className="col-span-3">
+                                    <Input
+                                      id="profile-picture"
+                                      type="file"
+                                      accept="image/*"
+                                      className="cursor-pointer"
+                                      onChange={(e) =>
+                                        handleEditPetPictureChange(e, setSelectedPet)
+                                      }
+                                      required
+                                    />
+                                  </div>
+                                </div> */}
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label
+                                    className="text-right"
+                                    htmlFor="description"
+                                  >
+                                    Description
+                                  </Label>
+                                  <Textarea
+                                    className="col-span-3 max-h-32 overflow-auto"
+                                    id="description"
+                                    required
+                                    value={petDescription}
+                                    onChange={(e) => setPetDescription(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="breed">
+                                    Breed
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="breed"
+                                    required
+                                    value={petBreed}
+                                    onChange={(e) => setPetBreed(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="color">
+                                    Color
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="color"
+                                    required
+                                    value={petColor}
+                                    onChange={(e) => setPetColor(e.target.value)}
+                                  />
+                                </div>
+
                               </div>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label
-                                className="text-right"
-                                htmlFor="description"
-                              >
-                                Description
-                              </Label>
-                              <Textarea
-                                className="col-span-3"
-                                id="description"
-                                value={pet.description}
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label className="text-right" htmlFor="breed">
-                                Breed
-                              </Label>
-                              <Input
-                                className="col-span-3"
-                                id="breed"
-                                value={pet.breed}
-                              />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label className="text-right" htmlFor="color">
-                                Color
-                              </Label>
-                              <Input
-                                className="col-span-3"
-                                id="color"
-                                value={pet.color}
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <Button type="submit">Save changes</Button>
-                          </DialogFooter>
-                        </DialogContent>
+                              <DialogFooter>
+                                <Button
+                                  type="submit">
+                                  Save changes
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                          </DialogContent>
+                        )}
                       </Dialog>
 
                       {/* Delete Pet Button & Alert Dialog */}
