@@ -45,12 +45,24 @@ const usersModel = {
         return await executeQuery(`INSERT INTO \"users\" (first_name, last_name, username, email, password) 
                                    VALUES ($1, $2, $3, $4, $5) RETURNING *`, [firstName, lastName, username, email, hashedPassword]);
     },
-    updateUser: async(firstName, lastName, username, email, profilePicture, location, prefLang, id) => {
-        return await executeQuery(`UPDATE \"users\" SET first_name = $1, last_name = $2, username = $3, email = $4, 
-                                   profile_pic = $5, location = $6, preferred_lang = $7 WHERE user_id = $8`, 
-                                   [firstName, lastName, username, email, profilePicture, location, prefLang, id ])
+    updateUser: async(nFirstName, nlastName, nEmail, nProfilePicture, nlocation, nPrefLang, userId) => {
+        const result = await executeQuery(`UPDATE \"users\" SET first_name = $1, last_name = $2, email = $3, 
+                                           profile_pic = $4, location = $5, preferred_lang = $6 WHERE user_id = $7 RETURNING *`, 
+                                           [nFirstName, nlastName, nEmail, nProfilePicture, nlocation, nPrefLang, userId ]);
+        return result.length > 0;
+    },
+    deleteUserPet: async(petId) => {
+        const result = await executeQuery(`DELETE FROM \"pets\" WHERE pet_id = $1 RETURNING *`, [petId]);
+        return result.length > 0;
+    },
+    updateUserPet: async(nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId) => {
+        const result = await executeQuery(`UPDATE \"pets\" SET name = $1, age = $2, profile_pic = $3, description = $4, breed = $5, 
+                                           color = $6 WHERE pet_id = $7 RETURNING *`, [nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId]);
+        return result.length > 0;
+    },
+    getUserPets: async(id) => {
+        return await executeQuery('SELECT pet_id, name, age, profile_pic, description, breed, color FROM \"pets\" WHERE owner_id = $1', [id]);
     }
-
 }
 
 

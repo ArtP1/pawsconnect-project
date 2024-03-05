@@ -25,8 +25,6 @@ const refresh = createRefresh<IUserData>({
         },
       });
 
-      console.log(param.authToken);
-      
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status}`);
       }

@@ -1,282 +1,593 @@
-import { useEffect, useState } from 'react';
-import React from "react"
-import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState, ChangeEvent } from "react";
+import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs";
+import {
+  CardTitle,
+  CardDescription,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  Card,
+} from "@/components/ui/card";
+import {
+  AlertDialogTrigger,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogFooter,
+  AlertDialogContent,
+  AlertDialog,
+} from "@/components/ui/alert-dialog";
+import {
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+  DialogHeader,
+  DialogFooter,
+  DialogContent,
+  Dialog,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import useUser from "@/hooks/useUsers";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
-import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs"
-import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "@/components/ui/card"
-import SucessAlert from '@/components/successAlert';
-
+import { DynamicAlert } from "@/components/component/dynamic-alert";
+import { Pet } from "@/models/petModel";
 
 export const ManageProfiles = () => {
-  // Form inputs
-  const [nFirstName, setFirstName] = useState('');
-  const [nLastName, setLastName] = useState('');
-  const [nUsername, setUsername] = useState('');
-  const [nEmail, setEmail] = useState('');
-  const [nProfilePicture, setProfilePicture] = useState('');
-  const [nLocation, setLocation] = useState('');
-  const [nPrefLang, setPrefLang] = useState('');
-
-  // Others
-  const [error, setError] = useState('');
   const authHeader = useAuthHeader();
 
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false); // State to control the visibility of SuccessAlert
+  // Necessary imports
+  const {
+    userProfile,
+    userPets,
+    updateProfile,
+    deletePet,
+    loading,
+    error,
+    success,
+    isAlert,
+    updatePet,
+  } = useUser(`${authHeader}`);
 
+  const [profilePicture, setProfilePicture] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [username, setUsername] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [location, setLocation] = useState("");
+  const [prefLang, setPrefLang] = useState("");
 
-  const handleProfileChange = async () => {
-    try {
-      const response = await fetch("/api/users/profile/update", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${authHeader}`
-        },
-        body: JSON.stringify({
-          nFirstName,
-          nLastName,
-          nUsername,
-          nEmail,
-          nProfilePicture,
-          nLocation,
-          nPrefLang
-        })
-      });
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [petName, setPetName] = useState("");
+  const [petAge, setPetAge] = useState(0);
+  const [petProfilePicture, setPetProfilePicture] = useState("");
+  const [petDescription, setPetDescription] = useState("");
+  const [petBreed, setPetBreed] = useState("");
+  const [petColor, setPetColor] = useState("");
 
-      if(response.ok) {
-        console.log("Inside the response ok");
-        const resp = await response.json();
-        console.log(resp.data);
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 3000);
-      }
-    } catch(err) {
-      setError('Failed to update profile'); 
+  useEffect(() => {
+    // handles user profile prefill
+    if (userProfile) {
+      setProfilePicture(userProfile.profile_pic || "");
+      setFirstName(userProfile.first_name || "");
+      setLastName(userProfile.last_name || "");
+      setUsername(userProfile.username || "");
+      setEmail(userProfile.email || "");
+      setLocation(userProfile.location || "");
+      setPrefLang(userProfile.preferred_lang || "");
     }
-  }
+  }, [userProfile]);
 
+  // Source: https://www.youtube.com/watch?v=2okUvC2qBWk
+  const compressImage = (imageDataUrl: string): Promise<string> => {
+    const maxWidth = 200;
+    const maxHeight = 200;
+    const quality = 0.7;
 
-  const handlePrefill = async () => {
-    try {
-      const response = await fetch("/api/users/profile", {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${authHeader}`
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
         }
-      });
 
-      if (response.ok) {
-        const resp = await response.json();
-        const data = resp.data;
+        canvas.width = width;
+        canvas.height = height;
 
-        setFirstName(data[0].first_name);
-        setLastName(data[0].last_name);
-        setUsername(data[0].username);
-        setEmail(data[0].email);
-        setProfilePicture(data[0].profile_pic);
-        setPrefLang(data[0].preferred_lang);
-        setLocation(data[0].location);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Failed to fetch profile data');
-      }
-    } catch (error) {
-      setError('Network error');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+        resolve(compressedDataUrl);
+      };
+
+      img.onerror = (error) => {
+        reject(error);
+      };
+
+      img.src = imageDataUrl;
+    });
+  };
+
+  const handleUserPFPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result as string;
+
+        compressImage(imageDataUrl)
+          .then((compressedDataUrl) => {
+            setProfilePicture(compressedDataUrl);
+          })
+          .catch((error) => {
+            console.error("Error compressing image:", error);
+          });
+      };
+
+      reader.readAsDataURL(file);
     }
   };
 
-  useEffect(() => {
-    handlePrefill();
-  }, []);
+  const handlePetPFPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result as string;
+
+        compressImage(imageDataUrl)
+          .then((compressedDataUrl) => {
+            setPetProfilePicture(compressedDataUrl);
+          })
+          .catch((error) => {
+            console.error("Error compressing image:", error);
+          });
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div key="1" className="flex flex-col gap-4 p-10">
-      {showSuccessAlert && <SucessAlert />}
+      {error && isAlert && (
+        <DynamicAlert type="error" title="Error" description={error} />
+      )}
+      {success && isAlert && (
+        <DynamicAlert type="success" title="Success" description={success} />
+      )}
+
       <main className="flex flex-col gap-4">
         <Tabs className="w-full" defaultValue="profile">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="pets">Pets</TabsTrigger>
           </TabsList>
-          <TabsContent className='flex justify-center items-center flex-col w-full' value="profile">
-            <div className="w-full max-w-2xl p-10 rounded-lg shadow-2xl dark:bg-gray-900 my-10">
-              <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">Profile Management</h2>
-              <div className="flex items-center justify-center mt-4">
 
-                <Avatar className="h-40 w-40">
-                  <AvatarImage alt="@shadcn" src="/placeholder-avatar.jpg" />
-                  <AvatarFallback>JP</AvatarFallback>
-                </Avatar>
-              </div>
+          {loading && <div>Loading...</div>}
+          {!loading && (
+            <TabsContent
+              className="flex justify-center items-center flex-col w-full"
+              value="profile"
+            >
+              <div className="w-full max-w-2xl p-10 rounded-lg shadow-2xl dark:bg-gray-900 my-10">
+                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">
+                  Profile Management
+                </h2>
+                <div className="flex items-center justify-center mt-4">
+                  <div className="flex items-center justify-center mt-4">
+                    <Label htmlFor="picture">
+                      <Avatar className="h-32 w-32 cursor-pointer">
+                        <AvatarImage
+                          alt="User Profile"
+                          src={profilePicture}
+                          className="object-cover"
+                        />
+                        <AvatarFallback>
+                          {firstName && firstName.length > 0
+                            ? firstName[0].toUpperCase()
+                            : ""}
+                          {lastName && lastName.length > 0
+                            ? lastName[0].toUpperCase()
+                            : ""}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Label>
+                    <Input
+                      accept="image/*"
+                      id="picture"
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={handleUserPFPChange}
+                    />
+                  </div>
+                </div>
 
-              <form id="profileForm" className="mt-4 space-y-4">
-                <div className="grid grid-cols-2 gap-2">
+                {/* Username display */}
+                {username && `@${username}`}
+
+                <form 
+                  id="profileForm" 
+                  className="mt-4 space-y-4"
+                  onSubmit={() =>
+                    updateProfile({
+                      nProfilePicture: profilePicture,
+                      nFirstName: firstName,
+                      nLastName: lastName,
+                      nEmail: email,
+                      nLocation: location,
+                      nPrefLang: prefLang,
+                    })
+                  }
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <Label className="text-blue-600" htmlFor="first-name">
+                        First name
+                      </Label>
+                      <Input
+                        className="text-gray-600 dark:text-gray-400"
+                        id="first-name"
+                        placeholder="Enter first name"
+                        required
+                        onChange={(e) => setFirstName(e.target.value)}
+                        value={firstName}
+                        type="text"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-blue-600" htmlFor="last-name">
+                        Last name
+                      </Label>
+                      <Input
+                        className="text-gray-600 dark:text-gray-400"
+                        id="last-name"
+                        placeholder="Enter last name"
+                        required
+                        onChange={(e) => setLastName(e.target.value)}
+                        value={lastName}
+                        type="text"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label className="text-blue-600" htmlFor="first-name">First name</Label>
+                    <Label className="text-blue-600" htmlFor="email">
+                      Email
+                    </Label>
                     <Input
-                      className="text-gray-600 dark:text-gray-400"
-                      id="first-name"
-                      placeholder="Enter first name"
+                      id="email"
+                      placeholder="Enter an email"
+                      type="email"
                       required
-                      onChange={(e) => setFirstName(e.target.value)}
-                      value={nFirstName}
-                      type='text' />
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    />
                   </div>
 
-                  <div className="space-y-2" >
-                    <Label className="text-blue-600" htmlFor="last-name">Last name</Label>
+                  <div className="space-y-2">
+                    <Label className="text-blue-600" htmlFor="language">
+                      Preferred Language
+                    </Label>
                     <Input
-                      className="text-gray-600 dark:text-gray-400"
-                      id="last-name"
-                      placeholder="Enter last name"
-                      required
-                      onChange={(e) => setLastName(e.target.value)}
-                      value={nLastName}
-                      type='text' />
+                      id="language"
+                      placeholder="Choose a preferred language"
+                      value={prefLang}
+                      type="text"
+                      onChange={(e) => setPrefLang(e.target.value)}
+                    />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label className='text-blue-600' htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    readOnly
-                    disabled
-                    type='text'
-                    placeholder="Enter username"
-                    value={`@${nUsername}`} />
-                </div>
+                  <div className="space-y-2">
+                    <Label className="text-blue-600" htmlFor="location">
+                      Location
+                    </Label>
+                    <Input
+                      id="location"
+                      placeholder="Enter a location"
+                      type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label className='text-blue-600' htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    placeholder="Enter an email"
-                    type="email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={nEmail} />
-                </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline">Cancel</Button>
+                    <Button type="submit">
+                      Save
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </TabsContent>
+          )}
 
-                <div className="space-y-2">
-                  <Label className='text-blue-600' htmlFor="language">Preferred Language</Label>
-                  <Input
-                    id="language"
-                    placeholder="Choose a preferred language"
-                    value={nPrefLang || ""} 
-                    type='text'
-                    onChange={(e) => setPrefLang(e.target.value)}/>
-                </div>
+          {/* Pets tab */}
+          <TabsContent
+            className="flex justify-center items-center flex-col w-full"
+            value="pets"
+          >
+            <div className="flex flex-wrap gap-4 w-4/5 justify-center">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm">
+                    Add New Pet
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Add New Pet</DialogTitle>
+                    <DialogDescription>
+                      Enter your new pet's details.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    {/* Form fields for new pet details */}
+                    {/* Implement onChange handlers and value bindings similar to existing fields */}
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      onClick={() => {
+                        /* handle adding new pet */
+                      }}
+                    >
+                      Add Pet
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
 
-                <div className="space-y-2">
-                  <Label className='text-blue-600' htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    placeholder="Enter a location"
-                    type='text'
-                    value={nLocation || ""}
-                    onChange={(e) => setLocation(e.target.value)} />
-                </div>
+              <div className="grid grid-cols-3 gap-10 w-full">
+                {/* Loops through the list of pets and assigns each a Card and other components */}
+                {userPets.map((pet, index) => (
+                  <Card key={index} className="w-full max-w-sm shadow-lg">
+                    <CardHeader>
+                      <CardTitle>{pet.name}</CardTitle>
+                      <CardDescription>
+                        {pet.breed}, {pet.age} years old
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex justify-center content-center">
+                      <img
+                        alt="Pet"
+                        src={pet.profile_pic}
+                        className="w-48 h-48 object-cover"
+                      />
+                    </CardContent>
 
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline">Cancel</Button>
-                  <Button onClick={handleProfileChange}>Save</Button>
-                </div>
-              </form>
-            </div>
-          </TabsContent>
-          <TabsContent className='flex justify-center items-center flex-col w-full' value="pets">
-            <div className="flex flex-wrap gap-4 w-4/5 ">
-              <div className='grid grid-cols-3 gap-4 w-full'>
-              <Card className="w-full max-w-md">
-                <CardHeader>
-                  <CardTitle>Fluffy</CardTitle>
-                  <CardDescription>Golden Retriever, 5 years old</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center items-center">
-                  <img
-                    alt="Pet"
-                    className="rounded-full w-50 h-50"
-                    height="200"
-                    src="/placeholder.svg"
-                    style={{
-                      aspectRatio: "200/200",
-                      objectFit: "cover",
-                    }}
-                    width="200"
-                  />
-                </CardContent>
-                <CardFooter>
-                  <Button className="ml-auto" variant="outline">
-                    Edit
-                  </Button>
-                  <Button className="ml-2" variant="outline">
-                    Delete
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="w-full max-w-md">
-                <CardHeader>
-                  <CardTitle>Whiskers</CardTitle>
-                  <CardDescription>Tabby Cat, 3 years old</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center items-center">
-                  <img
-                    alt="Pet"
-                    className="rounded-full w-50 h-50"
-                    height="200"
-                    src="/placeholder.svg"
-                    style={{
-                      aspectRatio: "200/200",
-                      objectFit: "cover",
-                    }}
-                    width="200"
-                  />
-                </CardContent>
-                <CardFooter>
-                  <Button className="ml-auto" variant="outline">
-                    Edit
-                  </Button>
-                  <Button className="ml-2" variant="outline">
-                    Delete
-                  </Button>
-                </CardFooter>
-              </Card>
-              <Card className="w-full max-w-md">
-                <CardHeader>
-                  <CardTitle>Goldie</CardTitle>
-                  <CardDescription>Goldfish, 1 year old</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center items-center">
-                  <img
-                    alt="Pet"
-                    className="rounded-full w-50 h-50"
-                    height="200"
-                    src="/placeholder.svg"
-                    style={{
-                      aspectRatio: "200/200",
-                      objectFit: "cover",
-                    }}
-                    width="200"
-                  />
-                </CardContent>
-                <CardFooter>
-                  <Button className="ml-auto" variant="outline">
-                    Edit
-                  </Button>
-                  <Button className="ml-2" variant="outline">
-                    Delete
-                  </Button>
-                </CardFooter>
-              </Card>
+                    <CardFooter className="flex justify-evenly mb-2">
+                      {/* Delete Pet Button & Alert Dialog */}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            className="shadow-lg"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedPet(pet);
+                              setPetName(pet.name);
+                              setPetAge(pet.age);
+                              setPetProfilePicture(pet.profile_pic);
+                              setPetDescription(pet.description);
+                              setPetBreed(pet.breed);
+                              setPetColor(pet.color);
+                            }}
+                          >
+                            Edit Pet
+                          </Button>
+                        </DialogTrigger>
+                          
+                        {/* If a pet is selected to be edited, prefill data, otherwise neglect */}
+                        {selectedPet && (
+                          <DialogContent className="max-w-lg">
+                            <DialogHeader>
+                              <DialogTitle>Edit Pet</DialogTitle>
+                              <DialogDescription>
+                                Make changes to your pet's profile here. Click
+                                save when you're done.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <form id="editPetForm"
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                updatePet({
+                                  petId: selectedPet.pet_id,
+                                  nName: petName,
+                                  nAge: petAge,
+                                  nProfilePic: petProfilePicture,
+                                  nDescription: petDescription,
+                                  nBreed: petBreed,
+                                  nColor: petColor,
+                              });
+                            }}>
+                              <div className="grid gap-4 py-4">
+                                <div className="flex items-center justify-center mb-5">
+                                  <div className="flex items-center justify-center">
+                                    <Label htmlFor="picture">
+                                      <Avatar className="h-13 w-13 cursor-pointer">
+                                        <AvatarImage
+                                          alt="User Profile"
+                                          src={petProfilePicture}
+                                          className="object-cover bg-cover"
+                                          style={{ width: '180px', height: '180px' }}
+                                        />
+                                        <AvatarFallback>
+                                          N/A
+                                        </AvatarFallback>
+                                      </Avatar>
+                                    </Label>
+                                    <Input
+                                      accept="image/*"
+                                      id="picture"
+                                      type="file"
+                                      style={{ display: "none" }}
+                                      onChange={handlePetPFPChange}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="name">
+                                    Name
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="name"
+                                    onChange={(e) => setPetName(e.target.value)}
+                                    value={petName}
+                                    required
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="name">
+                                    Age
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="name"
+                                    value={petAge}
+                                    type="number"
+                                    min="0"
+                                    max="20"
+                                    required
+                                    onChange={(e) => setPetAge(parseInt(e.target.value))}
+                                  />
+                                </div>
+
+                                {/* <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label
+                                    className="text-right"
+                                    htmlFor="profile-picture"
+                                  >
+                                    Profile Picture
+                                  </Label>
+                                  <div className="col-span-3">
+                                    <Input
+                                      id="profile-picture"
+                                      type="file"
+                                      accept="image/*"
+                                      className="cursor-pointer"
+                                      onChange={(e) =>
+                                        handleEditPetPictureChange(e, setSelectedPet)
+                                      }
+                                      required
+                                    />
+                                  </div>
+                                </div> */}
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label
+                                    className="text-right"
+                                    htmlFor="description"
+                                  >
+                                    Description
+                                  </Label>
+                                  <Textarea
+                                    className="col-span-3 max-h-32 overflow-auto"
+                                    id="description"
+                                    required
+                                    value={petDescription}
+                                    onChange={(e) => setPetDescription(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="breed">
+                                    Breed
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="breed"
+                                    required
+                                    value={petBreed}
+                                    onChange={(e) => setPetBreed(e.target.value)}
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right" htmlFor="color">
+                                    Color
+                                  </Label>
+                                  <Input
+                                    className="col-span-3"
+                                    id="color"
+                                    required
+                                    value={petColor}
+                                    onChange={(e) => setPetColor(e.target.value)}
+                                  />
+                                </div>
+
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  type="submit">
+                                  Save changes
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                          </DialogContent>
+                        )}
+                      </Dialog>
+
+                      {/* Delete Pet Button & Alert Dialog */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            className="shadow-lg"
+                            size="sm"
+                          >
+                            Delete Pet
+                          </Button>
+                        </AlertDialogTrigger>
+
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete your pet's data from our
+                              database.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deletePet(pet.pet_id)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </CardFooter>
+                  </Card>
+                ))}
               </div>
             </div>
           </TabsContent>
         </Tabs>
       </main>
     </div>
-  )
-}
+  );
+};

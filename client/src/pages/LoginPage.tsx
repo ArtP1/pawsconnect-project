@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
-
+import useUser from '@/hooks/useUsers';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -12,41 +12,28 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const signIn = useSignIn();
+  const { login } = useUser();
 
 
   const handleLogin = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch("/api/users/login", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    const resp = await login(email, password);
+
+    if(resp && resp.success) {
+
+      signIn({
+        auth: {
+          token: resp.data.accessToken,
+          type: "Bearer"
         },
-        body: JSON.stringify({ email, password })
+        userState: { id: resp.data.id },
+        refresh: resp.data.refreshToken
       });
 
-      if (response.ok) {
-        const resp = await response.json();
-
-        signIn({
-          auth: {
-            token: resp.data.accessToken,
-            type: "Bearer"
-          },
-          userState: { id: resp.data.id  },
-          refresh: resp.data.refreshToken
-        });
-
-        navigate('/');
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Failed to login');
-      }
-    } catch (err) {
-      console.error(err);
-      
-      setError('Network error');
+      navigate('/');
+    } else if(resp) {
+      setError(resp.message);
     }
   };
 

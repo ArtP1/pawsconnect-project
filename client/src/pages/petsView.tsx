@@ -31,7 +31,7 @@ export const PetsViewPage = () => {
                 <img
                   alt={`${pet.name} profile picture`}
                   className="rounded-full"
-                  src={pet.profile_picture || '/placeholder.svg'}
+                  src={pet.profile_pic || '/placeholder.svg'}
                   style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
                   width="80"
                   height="80"

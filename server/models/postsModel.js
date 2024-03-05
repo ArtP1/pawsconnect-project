@@ -19,7 +19,7 @@ const postsModel = {
         return await executeQuery('SELECT * FROM \"posts\"'); 
         // Expected output: https://drive.google.com/file/d/1MbDb3SK7ZnGiWSeB9Gma2ZvZ2XMrwMIT/view?usp=drive_link
     },
-    getPostByUserId: async (user_id) => {
+    getPostsByUserId: async (user_id) => {
         return await executeQuery(`SELECT * FROM \"posts\" WHERE user_id = $1`, [user_id]); // instead of using ? like in MySQL we use $1, $2, $3 in PostgreSQL
         // Expected output: https://drive.google.com/file/d/1rFHlh6Z1MZzi7Tlx-rDU_5zKco-WItDz/view?usp=drive_link
     },

@@ -12,7 +12,7 @@ export const PetList: React.FC<PetListProps> = ({ pets }) => (
     {pets.map(pet => (
       <li key={pet.pet_id}>
         <figure className="petPhoto">
-          <img src={pet.profile_picture} alt="doggo"/>
+          <img src={pet.profile_pic} alt="doggo"/>
           <figcaption>{pet.name} - {pet.breed}</figcaption>
         </figure>
       </li>

@@ -1,21 +1,22 @@
 const { catchAsync } = require('../config/utils'); 
 const petsModel = require('../models/petsModel');
+const { sendResponse } = require('../config/responseHandler');
 
 
 const petsController = {
     getPets: catchAsync(async (req, res) => {
         const pets = await petsModel.getPets();
-        res.json(pets);
+        sendResponse(res, 200, true, {pets}, "Pets retrieved successfully");
     }),
     getPetById: catchAsync(async (req, res) => {
         const { id } = req.params;
         const pet = await petsModel.getPetById(id);
-        res.json(pet);
+        sendResponse(res, 200, true, pet, "Pet retrieved successfully");
     }),
     getPetsByBreed: catchAsync(async (req, res) => {
         const { breed } = req.params;
         const pets = await petsModel.getPetsByBreed(breed);
-        res.json(pets);
+        sendResponse(res, 200, true, pets, `Pets of breed ${breed} retrieved successfully`);
     })
 }
 
