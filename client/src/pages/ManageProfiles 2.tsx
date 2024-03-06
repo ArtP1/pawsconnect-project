@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs"
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "@/components/ui/card"
-import SucessAlert from '@/components/successAlert';
+// import SucessAlert from '@/components/successAlert';
 
 
 export const ManageProfiles = () => {
@@ -95,7 +95,7 @@ export const ManageProfiles = () => {
 
   return (
     <div key="1" className="flex flex-col gap-4 p-10">
-      {showSuccessAlert && <SucessAlert />}
+      {/* {showSuccessAlert && <SucessAlert />} */}
       <main className="flex flex-col gap-4">
         <Tabs className="w-full" defaultValue="profile">
           <TabsList className="grid w-full grid-cols-2">

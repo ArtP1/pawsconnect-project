@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchUserProfile, fetchUserPets, updateUserProfile, 
-         deleteUserPet, updateUserPet } from '@/services/userService'; // adjust the import path as needed
+         deleteUserPet, updateUserPet, addUserPet } from '@/services/userService'; // adjust the import path as needed
 import { UserProfileUpdateBody } from '@/models/userModel';
-import { PetProfileUpdateBody } from '@/models/petModel';
+import { PetCreationBody, PetProfileUpdateBody } from '@/models/petModel';
 import { Pet } from '@/models/petModel';
 import { User } from '@/models/userModel';
 import { loginUser, signupUser } from '@/services/userService';
@@ -147,6 +147,31 @@ const useUser = (authHeader?: string) => {
 
         setLoading(false);
     };
+    const addNewPet = async (petBody: PetCreationBody) => {
+        if (!authHeader) return; // Ensure there's an authentication header
+    
+        setLoading(true);
+        clearNotifications();
+    
+        // Correctly pass authHeader and petBody as two separate arguments
+        const resp = await addUserPet(authHeader, petBody);
+    
+        if (resp.success) {
+            // Optionally refresh the list of user pets after successfully adding a new pet
+            await refreshUserPets();
+            setIsAlert(true);
+            setTimeout(() => setIsAlert(false), 3000);
+            setSuccess('Pet added successfully!');
+        } else {
+            setError(resp.message || 'Failed to add pet');
+        }
+    
+        setLoading(false);
+    };
+
+
+
+
 
 
     return {
@@ -162,6 +187,7 @@ const useUser = (authHeader?: string) => {
         updateProfile,
         updatePet,
         deletePet,
+        addNewPet, 
         isAlert
     };
 };

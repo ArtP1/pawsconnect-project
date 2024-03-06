@@ -1,5 +1,5 @@
 import { UserProfileUpdateBody } from "@/models/userModel";
-import { PetProfileUpdateBody } from "@/models/petModel";
+import { PetCreationBody, PetProfileUpdateBody } from "@/models/petModel";
 import { ApiResponse } from "@/models/apiModel";
 import { UserSignUp } from "@/models/userModel";
 
@@ -135,6 +135,30 @@ const deleteUserPet = async (authHeader: string, body: {petId: string}): Promise
 
     return data;
 }
+const addUserPet = async (authHeader: string, body: PetCreationBody): Promise<ApiResponse> => {
+    const { name, age, profilePic, description, breed, color, ownerId } = body;
+
+    const response = await fetch("/api/users/pets/add", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${authHeader}`
+        },
+        body: JSON.stringify({
+            name,
+            age,
+            profilePic,
+            description,
+            breed,
+            color,
+            ownerId  // Make sure your backend API expects this field to associate the pet with the user
+        })
+    });
+
+    const data = await response.json();
+
+    return data;
+};
 
 
 export {
@@ -144,5 +168,6 @@ export {
     fetchUserPets,
     updateUserProfile,
     deleteUserPet,
-    updateUserPet
+    updateUserPet,
+    addUserPet
 }

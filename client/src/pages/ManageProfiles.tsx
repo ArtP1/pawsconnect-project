@@ -47,12 +47,14 @@ export const ManageProfiles = () => {
     userPets,
     updateProfile,
     deletePet,
+    addNewPet,
     loading,
     error,
     success,
     isAlert,
     updatePet,
   } = useUser(`${authHeader}`);
+
 
   const [profilePicture, setProfilePicture] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -69,6 +71,8 @@ export const ManageProfiles = () => {
   const [petDescription, setPetDescription] = useState("");
   const [petBreed, setPetBreed] = useState("");
   const [petColor, setPetColor] = useState("");
+
+
 
   useEffect(() => {
     // handles user profile prefill
@@ -167,6 +171,42 @@ export const ManageProfiles = () => {
     }
   };
 
+  const handleAddNewPet = async (
+    e: React.FormEvent<HTMLFormElement>,
+    userId: string // Accept user ID as a parameter
+  ) => {
+    e.preventDefault();
+  
+    const petDetails = {
+      name: petName,
+      age: petAge,
+      profilePic: petProfilePicture,
+      description: petDescription,
+      breed: petBreed,
+      color: petColor,
+      ownerId: userId, // Use the provided user ID
+    };
+  
+    try {
+      const response = await addNewPet(petDetails);
+      // Handle success or error response here
+    } catch (error) {
+      console.error("Error adding pet:", error);
+    }
+  
+    // Reset the form fields after submission
+    setPetName("");
+    setPetAge(0);
+    setPetProfilePicture("");
+    setPetDescription("");
+    setPetBreed("");
+    setPetColor("");
+  };
+  
+
+  
+  
+
   return (
     <div key="1" className="flex flex-col gap-4 p-10">
       {error && isAlert && (
@@ -225,8 +265,8 @@ export const ManageProfiles = () => {
                 {/* Username display */}
                 {username && `@${username}`}
 
-                <form 
-                  id="profileForm" 
+                <form
+                  id="profileForm"
                   className="mt-4 space-y-4"
                   onSubmit={() =>
                     updateProfile({
@@ -341,19 +381,44 @@ export const ManageProfiles = () => {
                       Enter your new pet's details.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    {/* Form fields for new pet details */}
-                    {/* Implement onChange handlers and value bindings similar to existing fields */}
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      onClick={() => {
-                        /* handle adding new pet */
-                      }}
-                    >
-                      Add Pet
-                    </Button>
-                  </DialogFooter>
+                  <form className="grid gap-4 py-4" onSubmit={(e) => handleAddNewPet(e, userProfile.user_id)}>
+
+
+                    <Input
+                      placeholder="Pet Name"
+                      value={petName}
+                      onChange={(e) => setPetName(e.target.value)}
+                    />
+                    <Input
+                      placeholder="Pet Age"
+                      type="number"
+                      value={petAge}
+                      onChange={(e) => setPetAge(parseInt(e.target.value) || 0)}
+                    />
+                    <Input
+                      placeholder="Pet Profile Picture URL"
+                      value={petProfilePicture}
+                      onChange={(e) => setPetProfilePicture(e.target.value)}
+                    />
+                    <Textarea
+                      placeholder="Pet Description"
+                      value={petDescription}
+                      onChange={(e) => setPetDescription(e.target.value)}
+                    />
+                    <Input
+                      placeholder="Pet Breed"
+                      value={petBreed}
+                      onChange={(e) => setPetBreed(e.target.value)}
+                    />
+                    <Input
+                      placeholder="Pet Color"
+                      value={petColor}
+                      onChange={(e) => setPetColor(e.target.value)}
+                    />
+                    <DialogFooter>
+                      <Button type="submit">Add Pet</Button>
+                    </DialogFooter>
+                  </form>
                 </DialogContent>
               </Dialog>
 
@@ -396,7 +461,7 @@ export const ManageProfiles = () => {
                             Edit Pet
                           </Button>
                         </DialogTrigger>
-                          
+
                         {/* If a pet is selected to be edited, prefill data, otherwise neglect */}
                         {selectedPet && (
                           <DialogContent className="max-w-lg">
@@ -418,8 +483,8 @@ export const ManageProfiles = () => {
                                   nDescription: petDescription,
                                   nBreed: petBreed,
                                   nColor: petColor,
-                              });
-                            }}>
+                                });
+                              }}>
                               <div className="grid gap-4 py-4">
                                 <div className="flex items-center justify-center mb-5">
                                   <div className="flex items-center justify-center">
