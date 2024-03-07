@@ -99,6 +99,19 @@ const usersController = {
 
         sendResponse(res, 200, true, updatedPet, "Pet updated successfully.");
     }),
+    addUserPet: catchAsync(async (req, res) => {
+        const { petId, nName, nAge, nProfilePic, nDescription, nBreed, nColor, ownerId } = req.body;
+
+        const addedPet = await usersModel.addUserPet(nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId, ownerId);
+
+        if(!addedPet) {
+            return sendResponse(res, 404, false, {}, "Pet not added successfully.");
+        }
+
+        sendResponse(res, 200, true, addedPet, "Pet added successfully.");
+    }),
+
+
     deleteUserPet: catchAsync(async (req, res) => {
         const { petId } = req.query;
 

@@ -18,10 +18,13 @@ router.get('/profile', isAuthenticated, usersController.getUserById);
 // router.post('/profile/update', isAuthenticated, validateUserProfileUpdate, usersController.updateProfile);
 router.post('/profile/update', isAuthenticated, usersController.updateProfile);
 
+router.post('/pets/add', isAuthenticated, usersController.addUserPet);
+
+
 router.get('/pets', isAuthenticated, usersController.getUserPets);
 router.get('/pets/delete', isAuthenticated, usersController.deleteUserPet);
 router.post('/pets/update', isAuthenticated, usersController.updateUserPet)
-
+router.post('/pets/add', isAuthenticated, usersController.addUserPet)
 // Used to refresh JWT token 
 router.post('/refresh', isAuthenticated, usersController.refreshToken);
 

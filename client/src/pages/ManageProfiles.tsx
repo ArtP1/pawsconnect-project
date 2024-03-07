@@ -189,7 +189,7 @@ export const ManageProfiles = () => {
   
     try {
       const response = await addNewPet(petDetails);
-      // Handle success or error response here
+      console.log(response);
     } catch (error) {
       console.error("Error adding pet:", error);
     }

@@ -64,9 +64,9 @@ const usersModel = {
         return await executeQuery('SELECT pet_id, name, age, profile_pic, description, breed, color FROM \"pets\" WHERE owner_id = $1', [id]);
     },
     addUserPet: async (name, age, profilePic, description, breed, color, ownerId) => {
-        const sql = `INSERT INTO "pets" (name, age, profile_pic, description, breed, color, owner_id)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-        return await executeQuery(sql, [name, age, profilePic, description, breed, color, ownerId]);
+       const result =  executeQuery(`INSERT INTO \"pets\" (name, age, profile_pic, description, breed, color, owner_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, [name, age, profilePic, description, breed, color, ownerId]);
+        return result.length > 0;
     }
 }
 
