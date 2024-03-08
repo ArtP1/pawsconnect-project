@@ -50,14 +50,8 @@ const usersController = {
 
         const user = await usersModel.getUserByEmail(email);
         
-        if (user.length === 0) {
-            return sendResponse(res, 401, false, null, "Account doesn't exist");
-        }
-    
-        const isMatch = await bcrypt.compare(password, user[0].password);
-
-        if (!isMatch) {
-            return sendResponse(res, 401, false, null, "Incorrect email or password");
+        if (user.length === 0 || !(await bcrypt.compare(password, user[0].password))) {
+            return sendResponse(res, 401, false, null, "Invalid login details. Please try again.");
         }
 
         const accessToken = jwt.sign({ id: user[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
@@ -94,7 +88,7 @@ const usersController = {
         const updatedPet = await usersModel.updateUserPet(nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId);
 
         if(!updatedPet) {
-            return sendResponse(res, 404, false, {}, "Pet not found or update failed.");
+            return sendResponse(res, 404, false, null, "Pet not found or update failed.");
         }
 
         sendResponse(res, 200, true, updatedPet, "Pet updated successfully.");
@@ -104,8 +98,8 @@ const usersController = {
 
         const deletedPet = await usersModel.deleteUserPet(petId);
 
-        if(!deletedPet) {
-            return sendResponse(res, 200, false, null, "User pet failed to be deleted. If the problem persists, contact support for assistance.");
+        if (!deletedPet) {
+            return sendResponse(res, 404, false, null, "Pet not found or failed to be deleted. If the problem persists, contact support for assistance.");
         }
 
         sendResponse(res, 200, true, null, "User pet deleted successfully");
@@ -116,7 +110,7 @@ const usersController = {
         // No need to do error checks, the middleware takes care of this one
         const refreshToken = jwt.sign({ id: id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 
-        sendResponse(res, 200, true, { refreshToken: refreshToken }, "Profile updated successfully");
+        sendResponse(res, 200, true, { refreshToken: refreshToken }, "Refresh token issued successfully.");
     })
 }
 

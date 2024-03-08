@@ -25,5 +25,6 @@ export default ({ mode }: { mode: string }) => {
         },
       },
     },
+    base: './',
   });
 };

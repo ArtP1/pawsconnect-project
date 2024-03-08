@@ -13,6 +13,11 @@ const loginUser = async (email: string, password: string): Promise<ApiResponse> 
     body: JSON.stringify({ email, password })
     });
 
+    if(!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
+
     const data = await response.json();
 
     return data;
@@ -88,6 +93,11 @@ const updateUserProfile = async (authHeader: string, body: UserProfileUpdateBody
             nPrefLang
         })
     });
+
+    if(!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
 
     const data = await response.json();
 
