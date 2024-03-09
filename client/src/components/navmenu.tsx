@@ -23,14 +23,8 @@ export const NavMenu = () => {
     signOut();
   };
 
-  const authenticatedLinks = (
+  const authenticatedContent = (
     <>
-      <Link
-        className="flex items-center text-md font-medium hover:underline underline-offset-4"
-        to="#">
-        Feed
-      </Link>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar>
@@ -42,19 +36,15 @@ export const NavMenu = () => {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-45">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-center">@shadcn</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <Link to="/profiles">
-                Profiles
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            <Link to="/accounts/edit">
               Settings
+            </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
           <DropdownMenuSeparator />
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -69,7 +59,7 @@ export const NavMenu = () => {
   );
 
   // Navigation links for public (unauthenticated) users
-  const publicLinks = (
+  const publicContent = (
     <>
       <Link
         className="flex items-center text-md font-medium hover:underline underline-offset-4"
@@ -91,9 +81,9 @@ export const NavMenu = () => {
           <span className="ml-3 text-xl font-medium text-center">PawsConnect</span>
         </Link>
 
-        <nav className="flex items-center gap-4 sm:gap-10">
+        <nav className="flex items-center gap-4 sm:gap-11">
           {/* This allows us to hide routes that only authenticated users have access to */}
-          {isAuthenticated() ? authenticatedLinks : publicLinks}
+          {isAuthenticated() ? authenticatedContent : publicContent}
         </nav>
       </div>
     </header>

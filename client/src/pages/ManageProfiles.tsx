@@ -168,7 +168,7 @@ export const ManageProfiles = () => {
   };
 
   return (
-    <div key="1" className="flex flex-col gap-4 p-10">
+    <div key="1" className="flex flex-col gap-4 p-5">
       {error && isAlert && (
         <DynamicAlert type="error" title="Error" description={error} />
       )}
@@ -178,7 +178,7 @@ export const ManageProfiles = () => {
 
       <main className="flex flex-col gap-4">
         <Tabs className="w-full" defaultValue="profile">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-200">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="pets">Pets</TabsTrigger>
           </TabsList>
