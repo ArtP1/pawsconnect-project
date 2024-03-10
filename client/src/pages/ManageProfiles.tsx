@@ -172,6 +172,7 @@ export const ManageProfiles = () => {
   };
 
   const handleAddNewPet = async (e: React.FormEvent<HTMLFormElement>) => {
+    
     e.preventDefault();
     if (!userProfile.user_id) {
       console.error("User ID is missing");
