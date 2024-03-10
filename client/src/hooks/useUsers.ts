@@ -154,7 +154,7 @@ const useUser = (authHeader?: string) => {
         clearNotifications();
     
         // Correctly pass authHeader and petBody as two separate arguments
-        const resp = await addUserPet(authHeader, petBody);
+        const resp = await addUserPet(authHeader,petBody);
     
         if (resp.success) {
             // Optionally refresh the list of user pets after successfully adding a new pet

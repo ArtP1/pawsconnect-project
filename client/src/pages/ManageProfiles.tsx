@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent } from "react";
+import { useEffect, useState } from "react";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -65,12 +65,12 @@ export const ManageProfiles = () => {
   const [prefLang, setPrefLang] = useState("");
 
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
-  const [petName, setPetName] = useState("");
-  const [petAge, setPetAge] = useState(0);
-  const [petProfilePicture, setPetProfilePicture] = useState("");
-  const [petDescription, setPetDescription] = useState("");
-  const [petBreed, setPetBreed] = useState("");
-  const [petColor, setPetColor] = useState("");
+  const [petName, setPetName] = useState<string>("");
+  const [petAge, setPetAge] = useState<number>(0); 
+  const [petProfilePicture, setPetProfilePicture] = useState<string>("");
+  const [petDescription, setPetDescription] = useState<string>("");
+  const [petBreed, setPetBreed] = useState<string>("");
+  const [petColor, setPetColor] = useState<string>("");
 
 
 
@@ -171,41 +171,67 @@ export const ManageProfiles = () => {
     }
   };
 
-  const handleAddNewPet = async (
-    e: React.FormEvent<HTMLFormElement>,
-    userId: string // Accept user ID as a parameter
-  ) => {
+  const handleAddNewPet = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+    if (!userProfile.user_id) {
+      console.error("User ID is missing");
+      return;
+    }
+
     const petDetails = {
       name: petName,
       age: petAge,
-      profilePic: petProfilePicture,
+      profile_pic: petProfilePicture,
       description: petDescription,
       breed: petBreed,
       color: petColor,
-      ownerId: userId, // Use the provided user ID
+      owner_id: userProfile.user_id,
     };
-  
+
     try {
       const response = await addNewPet(petDetails);
-      console.log(response);
+      console.log("Pet added successfully:", response);
+      // Reset the form fields after successful submission
+      setPetName("");
+      setPetAge(0);
+      setPetProfilePicture("");
+      setPetDescription("");
+      setPetBreed("");
+      setPetColor("");
     } catch (error) {
       console.error("Error adding pet:", error);
     }
-  
-    // Reset the form fields after submission
-    setPetName("");
-    setPetAge(0);
-    setPetProfilePicture("");
-    setPetDescription("");
-    setPetBreed("");
-    setPetColor("");
   };
-  
 
-  
-  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+
+    switch (id) {
+      case 'petName':
+        setPetName(value);
+        break;
+      case 'petAge':
+        setPetAge(Number(value));
+        break;
+      case 'petProfilePicture':
+        setPetProfilePicture(value);
+        break;
+      case 'petDescription':
+        setPetDescription(value);
+        break;
+      case 'petBreed':
+        setPetBreed(value);
+        break;
+      case 'petColor':
+        setPetColor(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+
+
 
   return (
     <div key="1" className="flex flex-col gap-4 p-10">
@@ -377,50 +403,35 @@ export const ManageProfiles = () => {
                 <DialogContent className="max-w-lg">
                   <DialogHeader>
                     <DialogTitle>Add New Pet</DialogTitle>
-                    <DialogDescription>
-                      Enter your new pet's details.
-                    </DialogDescription>
+                    <DialogDescription>Enter your new pet's details.</DialogDescription>
                   </DialogHeader>
-                  <form className="grid gap-4 py-4" onSubmit={(e) => handleAddNewPet(e, userProfile.user_id)}>
+                  <form className="grid gap-4 py-4" onSubmit={handleAddNewPet}>
+                    <Label htmlFor="petName">Pet Name</Label>
+                    <Input id="petName" placeholder="Pet Name" value={petName} onChange={handleChange} />
 
+                    <Label htmlFor="petAge">Pet Age</Label>
+                    <Input id="petAge" placeholder="Pet Age" type="number" value={petAge} onChange={handleChange} />
 
-                    <Input
-                      placeholder="Pet Name"
-                      value={petName}
-                      onChange={(e) => setPetName(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Pet Age"
-                      type="number"
-                      value={petAge}
-                      onChange={(e) => setPetAge(parseInt(e.target.value) || 0)}
-                    />
-                    <Input
-                      placeholder="Pet Profile Picture URL"
-                      value={petProfilePicture}
-                      onChange={(e) => setPetProfilePicture(e.target.value)}
-                    />
-                    <Textarea
-                      placeholder="Pet Description"
-                      value={petDescription}
-                      onChange={(e) => setPetDescription(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Pet Breed"
-                      value={petBreed}
-                      onChange={(e) => setPetBreed(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Pet Color"
-                      value={petColor}
-                      onChange={(e) => setPetColor(e.target.value)}
-                    />
+                    <Label htmlFor="petProfilePicture">Pet Profile Picture URL</Label>
+                    <Input id="petProfilePicture" placeholder="Pet Profile Picture URL" value={petProfilePicture} onChange={handleChange} />
+
+                    <Label htmlFor="petDescription">Pet Description</Label>
+                    <Textarea id="petDescription" placeholder="Pet Description" value={petDescription} onChange={handleChange} />
+
+                    <Label htmlFor="petBreed">Pet Breed</Label>
+                    <Input id="petBreed" placeholder="Pet Breed" value={petBreed} onChange={handleChange} />
+
+                    <Label htmlFor="petColor">Pet Color</Label>
+                    <Input id="petColor" placeholder="Pet Color" value={petColor} onChange={handleChange} />
+
                     <DialogFooter>
                       <Button type="submit">Add Pet</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
+
               </Dialog>
+
 
               <div className="grid grid-cols-3 gap-10 w-full">
                 {/* Loops through the list of pets and assigns each a Card and other components */}

@@ -12,12 +12,15 @@ const catchAsync = (fn) => async (req, res) => {
 };
 
 const executeQuery = async (query, params = []) => {
-    try {
-        const { rows, fields } = await client.query(query, params);
-        return rows;
-    } catch (err) {
-        throw err;
-    }
+  try {
+      const { rows } = await client.query(query, params);
+      return rows;
+  } catch (err) {
+      console.error(`Query Error: ${err.message}`);
+      console.error(`Query: ${query}`);
+      console.error(`Params: ${params}`);
+      throw err;
+  }
 }
 
 

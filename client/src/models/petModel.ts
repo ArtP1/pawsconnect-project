@@ -18,19 +18,17 @@ interface PetProfileUpdateBody {
   nColor: string;
 }
 
-// Used within the ManageProfile page
-// Excludes 'description', 'color'
+
 interface UserPetProfile extends Omit<Pet, 'description' | 'color'> { }
 
-// Define a new interface for the request body when creating a new pet
 interface PetCreationBody {
   name: string;
   age: number;
-  profilePic: string;
+  profile_pic: string;
   description: string;
   breed: string;
   color: string;
-  ownerId: string;  // Include the ownerId to associate the pet with its owner
+  owner_id: string;  
 }
 
 export type {

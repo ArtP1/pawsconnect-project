@@ -136,7 +136,9 @@ const deleteUserPet = async (authHeader: string, body: {petId: string}): Promise
     return data;
 }
 const addUserPet = async (authHeader: string, body: PetCreationBody): Promise<ApiResponse> => {
-    const { name, age, profilePic, description, breed, color, ownerId } = body;
+    console.log(body);
+    console.log(authHeader);
+    const { name, age, profile_pic, description, breed, color, owner_id } = body;
 
     const response = await fetch("/api/users/pets/add", {
         method: 'POST',
@@ -147,17 +149,24 @@ const addUserPet = async (authHeader: string, body: PetCreationBody): Promise<Ap
         body: JSON.stringify({
             name,
             age,
-            profilePic,
+            profile_pic,
             description,
             breed,
             color,
-            ownerId  // Make sure your backend API expects this field to associate the pet with the user
+            owner_id 
         })
     });
+    
+    
 
-    const data = await response.json();
-
-    return data;
+    if (response.ok) {
+        const data = await response.json();
+        return data;
+    } else {
+        // Handle errors, e.g., by throwing an error or returning a custom error object
+        console.error('Failed to add pet:', response.statusText);
+        return { success: false, message: `Error: ${response.statusText}` };
+    }
 };
 
 
