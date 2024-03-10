@@ -12,6 +12,11 @@ const usersController = {
         const users = await usersModel.getUsers();
         sendResponse(res, 200, true, users, "Users retrieved successfully");
     }),
+    getFriends: catchAsync(async (req, res) => {
+        const { id } = req.user;
+        const friends = await usersModel.getFriends(id);
+        sendResponse(res, 200, true, friends, "Use Friends retrieved successfully");
+    }),
     getUserById: catchAsync(async (req, res) => {
         const { id } = req.user;
 

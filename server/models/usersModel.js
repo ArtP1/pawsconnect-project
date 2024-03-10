@@ -27,6 +27,11 @@ const usersModel = {
         return await executeQuery('SELECT * FROM \"users\"'); 
         // Expected output: https://drive.google.com/file/d/17OP1E2e4u9R2xMeXNO9k4f0YdhWlmRI8/view?usp=drive_link
     },
+    getFriends: async (id) => {
+        return await executeQuery("SELECT u.user_id, u.first_name, u.last_name, u.username, u.profile_pic, u.location FROM \"users\" u " +
+                                  "JOIN \"userrelationships\" ur " +
+                                  "ON u.user_id = ur.friend_id WHERE ur.user_id = $1", [id]);
+    },
     getUserById: async (id) => {
         return await executeQuery(`SELECT * FROM \"users\" WHERE user_id = $1`, [id]); // instead of using ? like in MySQL we use $1, $2, $3 in PostgreSQL
         // Expected output: https://drive.google.com/file/d/1Sh0yW2SxTrNVeAOvam3yoVjSlW7srTjJ/view?usp=drive_link
