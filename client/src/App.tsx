@@ -8,9 +8,10 @@ import { FriendsPage } from "./pages/FriendsPage";
 import { GuestPage } from "./pages/GuestPage";
 import { UserSettings } from "./pages/UserSettings";
 import { GuestsExplorePage } from "./pages/GuestsExplorePage";
-import AuthOutlet from "@auth-kit/react-router/AuthOutlet";
 import { AuthenticatedLayout } from "./pages/Layouts/AuthenticatedLayout";
+import { NetworkGraph } from "./pages/NetworkGraph";
 import './App.css'
+import AuthOutlet from "@auth-kit/react-router/AuthOutlet";
 
 
 // React Router Github reference: Tutorial [https://reactrouter.com/en/main/start/tutorial]
@@ -25,6 +26,7 @@ function App() {
           <Route path="/" element={<AuthenticatedLayout><FeedPage/></AuthenticatedLayout>}></Route>
           <Route path="/friends" element={<AuthenticatedLayout><FriendsPage/></AuthenticatedLayout>}></Route>
           <Route path="/accounts/edit" element={<UserSettings />}></Route>
+          <Route path="/connections" element={<AuthenticatedLayout><NetworkGraph/></AuthenticatedLayout>}></Route>
         </Route>
 
         {/* All public routes */}

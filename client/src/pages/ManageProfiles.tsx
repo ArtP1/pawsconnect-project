@@ -47,7 +47,8 @@ export const ManageProfiles = () => {
     userPets,
     updateProfile,
     deletePet,
-    loading,
+    loadingProfile,
+    loadingPets,
     error,
     success,
     isAlert,
@@ -167,6 +168,10 @@ export const ManageProfiles = () => {
     }
   };
 
+  if (loadingProfile || loadingPets) {
+    return <div>Loading...</div>; // Customize as needed
+  }
+
   return (
     <div key="1" className="flex flex-col gap-4 p-5">
       {error && isAlert && (
@@ -183,8 +188,8 @@ export const ManageProfiles = () => {
             <TabsTrigger value="pets">Pets</TabsTrigger>
           </TabsList>
 
-          {loading && <div>Loading...</div>}
-          {!loading && (
+          {/* {loading && <div>Loading...</div>}
+          {!loading && ( */}
             <TabsContent
               className="flex justify-center items-center flex-col w-full"
               value="profile"
@@ -225,8 +230,8 @@ export const ManageProfiles = () => {
                 {/* Username display */}
                 {username && `@${username}`}
 
-                <form 
-                  id="profileForm" 
+                <form
+                  id="profileForm"
                   className="mt-4 space-y-4"
                   onSubmit={() =>
                     updateProfile({
@@ -320,7 +325,7 @@ export const ManageProfiles = () => {
                 </form>
               </div>
             </TabsContent>
-          )}
+          
 
           {/* Pets tab */}
           <TabsContent
@@ -396,7 +401,7 @@ export const ManageProfiles = () => {
                             Edit Pet
                           </Button>
                         </DialogTrigger>
-                          
+
                         {/* If a pet is selected to be edited, prefill data, otherwise neglect */}
                         {selectedPet && (
                           <DialogContent className="max-w-lg">
@@ -418,8 +423,8 @@ export const ManageProfiles = () => {
                                   nDescription: petDescription,
                                   nBreed: petBreed,
                                   nColor: petColor,
-                              });
-                            }}>
+                                });
+                              }}>
                               <div className="grid gap-4 py-4">
                                 <div className="flex items-center justify-center mb-5">
                                   <div className="flex items-center justify-center">
