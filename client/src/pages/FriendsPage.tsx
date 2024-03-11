@@ -38,37 +38,43 @@ export const FriendsPage = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)} />
                         </div>
-                        {loadingFriends ? (
+                        {loadingFriends && !userFriends ? (
                             <div className="flex justify-center items-center h-[70vh]">
                                 <img src="/Running dog.gif" alt="Loading" />
                             </div>
-                        ) : filteredFriends.length > 0 ? (
-                            <ScrollArea className="h-[70vh]" type="hover" scrollHideDelay={75}>
-                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                    {filteredFriends.map((user) => (
-                                        <Card key={user.user_id} className="cursor-pointer">
-                                            <CardContent className="flex flex-col space-y-4 p-5">
-                                                <div className="flex flex-col items-center space-y-4">
-                                                    <Avatar className="h-[60px] w-[60px]">
-                                                        <AvatarImage
-                                                            className="object-cover"
-                                                            alt={`${user.first_name} ${user.last_name}`}
-                                                            src={user.profile_pic} />
-                                                    </Avatar>
-                                                    <div className="w-full">
-                                                        <h3 className="text-lg font-semibold">{user.first_name} {user.last_name}</h3>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400 w-full break-words">@{user.username}</p><br />
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400 w-4/5 break-words">{user.location}</p>
+                        ) : userFriends && userFriends.length > 0 ? (
+                            filteredFriends.length > 0 ? (
+                                <ScrollArea className="h-[70vh]" type="hover" scrollHideDelay={75}>
+                                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                        {filteredFriends.map((user) => (
+                                            <Card key={user.user_id} className="cursor-pointer">
+                                                <CardContent className="flex flex-col space-y-4 p-5">
+                                                    <div className="flex flex-col items-center space-y-4">
+                                                        <Avatar className="h-[60px] w-[60px]">
+                                                            <AvatarImage
+                                                                className="object-cover"
+                                                                alt={`${user.first_name} ${user.last_name}`}
+                                                                src={user.profile_pic} />
+                                                        </Avatar>
+                                                        <div className="w-full">
+                                                            <h3 className="text-lg font-semibold">{user.first_name} {user.last_name}</h3>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 w-full break-words">@{user.username}</p><br />
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 w-4/5 break-words">{user.location}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </ScrollArea>
+                            ) : (
+                                <div className="text-center py-10 w-full">
+                                    <p>No friends found matching your search.</p>
                                 </div>
-                            </ScrollArea>
+                            )
                         ) : (
                             <div className="text-center py-10 w-full">
-                                <p>No friends found matching your search.</p>
+                                <p>No users found.</p>
                             </div>
                         )}
                     </div>

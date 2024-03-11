@@ -50,7 +50,7 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
 
                     <Link
                         className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
-                        to="#">
+                        to="/connections">
                         <IoIosGitNetwork className="h-5 w-5" />
                         <span>Network</span>
                     </Link>
