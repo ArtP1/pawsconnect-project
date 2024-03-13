@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PostCreationBody } from "@/models/postModel";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { createPost } from "@/services/postService";
-import { fetchUserProfile } from "@/services/userService"; // Import fetchUserProfile
+import { fetchUserProfile } from "@/services/userService"; 
 
 interface PostCreationModalProps {
   onClose: () => void;
@@ -57,31 +57,31 @@ const PostCreationModal: React.FC<PostCreationModalProps> = ({ onClose }) => {
   const handleSubmit = async (e: FormEvent) => {
     const authHeader = useAuthHeader();
     e.preventDefault();
-  
+
     try {
       if (!authHeader) {
         console.error('User not authenticated');
         return;
       }
-  
+
       if (!image) {
         console.error('No image selected');
         return;
       }
-  
+
       const formData = new FormData();
       formData.append('image', image);
-  
+
       const postBody: PostCreationBody = {
         user_id: userProfile?.user_id,
         content: imageUrl, // Use imageUrl instead of image
         caption: caption,
         visibility: 'public',
       };
-  
+
       // Call the createPost function from the postService
       const response = await createPost(authHeader, postBody);
-  
+
       if (response.success) {
         // Handle success
         onClose();
@@ -93,7 +93,7 @@ const PostCreationModal: React.FC<PostCreationModalProps> = ({ onClose }) => {
       console.error('Error creating post:', error);
     }
   };
-  
+
 
   return (
     <div className="flex flex-wrap gap-4 w-4/5 justify-center">
