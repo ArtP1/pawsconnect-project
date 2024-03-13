@@ -52,18 +52,20 @@ const usersController = {
     }),
     login: catchAsync(async (req, res) => {
         const { email, password } = req.body;
-
+    
         const user = await usersModel.getUserByEmail(email);
-        
-        if (user.length === 0 || !(await bcrypt.compare(password, user[0].password))) {
+    
+      
+        if (!user || user.length === 0 || !(await bcrypt.compare(password, user[0].password))) {
             return sendResponse(res, 401, false, null, "Invalid login details. Please try again.");
         }
-
+    
         const accessToken = jwt.sign({ id: user[0].user_id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
         const refreshToken = jwt.sign({ id: user[0].user_id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
-
+    
         sendResponse(res, 200, true, { id: user[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "Login successful. Welcome back!");
     }),
+    
     updateProfile: catchAsync(async (req, res) => {
         const { id } = req.user;
         const { nFirstName, nLastName, nEmail, nProfilePicture, nLocation, nPrefLang } = req.body;

@@ -42,19 +42,23 @@ export const ManageProfiles = () => {
   const authHeader = useAuthHeader();
 
   // Necessary imports
+
   const {
     userProfile,
     userPets,
     updateProfile,
     deletePet,
+    addNewPet, 
+    loadingProfile, 
+    loadingPets, 
     error,
     success,
     isAlert,
     updatePet,
-    loadingProfile,
-    loadingPets
   } = useUser(`${authHeader}`);
 
+
+  const loading = loadingProfile || loadingPets;
 
   const [profilePicture, setProfilePicture] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -72,6 +76,9 @@ export const ManageProfiles = () => {
   const [petBreed, setPetBreed] = useState<string>("");
   const [petColor, setPetColor] = useState<string>("");
 
+  if (loading) { // Unified loading condition
+    return <div>Loading...</div>; // Customize as needed
+  }
 
 
   useEffect(() => {
@@ -168,6 +175,67 @@ export const ManageProfiles = () => {
       };
 
       reader.readAsDataURL(file);
+    }
+  };
+
+
+  const handleAddNewPet = async (e: React.FormEvent<HTMLFormElement>) => {
+    
+    e.preventDefault();
+    if (!userProfile.user_id) {
+      console.error("User ID is missing");
+      return;
+    }
+
+    const petDetails = {
+      name: petName,
+      age: petAge,
+      profile_pic: petProfilePicture,
+      description: petDescription,
+      breed: petBreed,
+      color: petColor,
+      owner_id: userProfile.user_id,
+    };
+
+    try {
+      const response = await addNewPet(petDetails);
+      console.log("Pet added successfully:", response);
+      // Reset the form fields after successful submission
+      setPetName("");
+      setPetAge(0);
+      setPetProfilePicture("");
+      setPetDescription("");
+      setPetBreed("");
+      setPetColor("");
+    } catch (error) {
+      console.error("Error adding pet:", error);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+
+    switch (id) {
+      case 'petName':
+        setPetName(value);
+        break;
+      case 'petAge':
+        setPetAge(Number(value));
+        break;
+      case 'petProfilePicture':
+        setPetProfilePicture(value);
+        break;
+      case 'petDescription':
+        setPetDescription(value);
+        break;
+      case 'petBreed':
+        setPetBreed(value);
+        break;
+      case 'petColor':
+        setPetColor(value);
+        break;
+      default:
+        break;
     }
   };
 

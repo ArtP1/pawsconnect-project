@@ -5,7 +5,7 @@ import {
     updateUserProfile,
     deleteUserPet,
     updateUserPet, addUserPet,
-    // fetchUserFriends
+    fetchUserFriends
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { PetCreationBody, PetProfileUpdateBody } from "@/models/petModel";
@@ -162,7 +162,7 @@ const useUser = (authHeader?: string) => {
     const addNewPet = async (petBody: PetCreationBody) => {
         if (!authHeader) return; // Ensure there's an authentication header
     
-        setLoading(true);
+        setLoadingPets(true);
         clearNotifications();
     
         // Correctly pass authHeader and petBody as two separate arguments
@@ -178,7 +178,7 @@ const useUser = (authHeader?: string) => {
             setError(resp.message || 'Failed to add pet');
         }
     
-        setLoading(false);
+        setLoadingPets(false);
     };
 
 

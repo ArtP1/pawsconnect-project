@@ -18,6 +18,7 @@ router.get('/profile', isAuthenticated, usersController.getUserById);
 // router.post('/profile/update', isAuthenticated, validateUserProfileUpdate, usersController.updateProfile);
 router.post('/profile/update', isAuthenticated, usersController.updateProfile);
 router.get('/friends', isAuthenticated, usersController.getFriends);
+router.post('/pets/add', isAuthenticated, usersController.addUserPet)
 
 router.get('/pets', isAuthenticated, usersController.getUserPets);
 router.get('/pets/delete', isAuthenticated, usersController.deleteUserPet);
