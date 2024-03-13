@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Footer } from '@/components/Footer';
 import PostCreationModal from '@/pages/postCreationModal';
-import { DialogTrigger, Dialog } from "@/components/ui/dialog"; // Import Dialog and DialogTrigger
 
 
 interface AuthenticatedLayoutProps {
@@ -75,6 +74,14 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
                             <IoIosAddCircle className="h-5 w-5" />
                             {showModal && <PostCreationModal onClose={handleCloseModal} />}
                         </button>
+
+                        <Link
+                            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                            to="/accounts/edit">
+                            <IoIosGitNetwork className="h-5 w-5" />
+                            <span>Profile</span>
+                        </Link>
+
                     </nav>
                 </div>
 
