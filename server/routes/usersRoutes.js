@@ -17,14 +17,12 @@ router.get('/profile', isAuthenticated, usersController.getUserById);
 // Middleware order matters, in this instance we first check that the user is authenticated, and then we perform the validation
 // router.post('/profile/update', isAuthenticated, validateUserProfileUpdate, usersController.updateProfile);
 router.post('/profile/update', isAuthenticated, usersController.updateProfile);
-
-router.post('/pets/add', isAuthenticated, usersController.addUserPet);
-
+router.get('/friends', isAuthenticated, usersController.getFriends);
 
 router.get('/pets', isAuthenticated, usersController.getUserPets);
 router.get('/pets/delete', isAuthenticated, usersController.deleteUserPet);
 router.post('/pets/update', isAuthenticated, usersController.updateUserPet)
-router.post('/pets/add', isAuthenticated, usersController.addUserPet)
+
 // Used to refresh JWT token 
 router.post('/refresh', isAuthenticated, usersController.refreshToken);
 

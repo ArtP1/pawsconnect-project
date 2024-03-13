@@ -47,12 +47,12 @@ export const ManageProfiles = () => {
     userPets,
     updateProfile,
     deletePet,
-    addNewPet,
-    loading,
     error,
     success,
     isAlert,
     updatePet,
+    loadingProfile,
+    loadingPets
   } = useUser(`${authHeader}`);
 
 
@@ -171,71 +171,8 @@ export const ManageProfiles = () => {
     }
   };
 
-  const handleAddNewPet = async (e: React.FormEvent<HTMLFormElement>) => {
-    
-    e.preventDefault();
-    if (!userProfile.user_id) {
-      console.error("User ID is missing");
-      return;
-    }
-
-    const petDetails = {
-      name: petName,
-      age: petAge,
-      profile_pic: petProfilePicture,
-      description: petDescription,
-      breed: petBreed,
-      color: petColor,
-      owner_id: userProfile.user_id,
-    };
-
-    try {
-      const response = await addNewPet(petDetails);
-      console.log("Pet added successfully:", response);
-      // Reset the form fields after successful submission
-      setPetName("");
-      setPetAge(0);
-      setPetProfilePicture("");
-      setPetDescription("");
-      setPetBreed("");
-      setPetColor("");
-    } catch (error) {
-      console.error("Error adding pet:", error);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-
-    switch (id) {
-      case 'petName':
-        setPetName(value);
-        break;
-      case 'petAge':
-        setPetAge(Number(value));
-        break;
-      case 'petProfilePicture':
-        setPetProfilePicture(value);
-        break;
-      case 'petDescription':
-        setPetDescription(value);
-        break;
-      case 'petBreed':
-        setPetBreed(value);
-        break;
-      case 'petColor':
-        setPetColor(value);
-        break;
-      default:
-        break;
-    }
-  };
-
-
-
-
   return (
-    <div key="1" className="flex flex-col gap-4 p-10">
+    <div key="1" className="flex flex-col gap-4 p-5">
       {error && isAlert && (
         <DynamicAlert type="error" title="Error" description={error} />
       )}
@@ -245,13 +182,13 @@ export const ManageProfiles = () => {
 
       <main className="flex flex-col gap-4">
         <Tabs className="w-full" defaultValue="profile">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 bg-gray-200">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="pets">Pets</TabsTrigger>
           </TabsList>
 
-          {loading && <div>Loading...</div>}
-          {!loading && (
+          {/* {loading && <div>Loading...</div>}
+          {!loading && ( */}
             <TabsContent
               className="flex justify-center items-center flex-col w-full"
               value="profile"
@@ -387,7 +324,7 @@ export const ManageProfiles = () => {
                 </form>
               </div>
             </TabsContent>
-          )}
+          
 
           {/* Pets tab */}
           <TabsContent

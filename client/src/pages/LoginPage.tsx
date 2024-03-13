@@ -9,10 +9,9 @@ import useUser from '@/hooks/useUsers';
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
   const signIn = useSignIn();
-  const { login } = useUser();
+  const { login, error } = useUser();
 
 
   const handleLogin = async (e: { preventDefault: () => void; }) => {
@@ -32,8 +31,6 @@ export const LoginPage = () => {
       });
 
       navigate('/');
-    } else if(resp) {
-      setError(resp.message);
     }
   };
 
@@ -77,7 +74,9 @@ export const LoginPage = () => {
             </div>
             <Input id="password" value={password} onChange={(e) => setPassword(e.target.value)} required type="password" />
           </div>
+
           {error && <div className="text-red-500">{error}</div>}
+
           <Button className="w-full" type="submit">
             Login
           </Button>

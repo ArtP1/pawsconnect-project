@@ -6,12 +6,17 @@ import { UserSignUp } from "@/models/userModel";
 
 const loginUser = async (email: string, password: string): Promise<ApiResponse> => {
     const response = await fetch("/api/users/login", {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
     });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
 
     const data = await response.json();
 
@@ -19,19 +24,19 @@ const loginUser = async (email: string, password: string): Promise<ApiResponse> 
 };
 
 const signupUser = async (body: UserSignUp): Promise<ApiResponse> => {
-    const { first_name, last_name, username, email, password  } = body;
+    const { first_name, last_name, username, email, password } = body;
 
     const response = await fetch("/api/users/signup", {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-            firstName: first_name, 
-            lastName: last_name, 
-            username, 
-            email, 
-            password 
+        body: JSON.stringify({
+            firstName: first_name,
+            lastName: last_name,
+            username,
+            email,
+            password
         })
     });
 
@@ -89,16 +94,33 @@ const updateUserProfile = async (authHeader: string, body: UserProfileUpdateBody
         })
     });
 
+    if (!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
+
     const data = await response.json();
 
     return data;
 }
 
+const fetchUserFriends = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch("/api/users/friends", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
 
 const updateUserPet = async (authHeader: string, body: PetProfileUpdateBody): Promise<ApiResponse> => {
     const { petId, nName, nAge, nProfilePic, nDescription, nBreed, nColor } = body;
 
-    const response = await fetch(`/api/users/pets/update`, {
+    const response = await fetch("/api/users/pets/update", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -121,7 +143,7 @@ const updateUserPet = async (authHeader: string, body: PetProfileUpdateBody): Pr
 }
 
 
-const deleteUserPet = async (authHeader: string, body: {petId: string}): Promise<ApiResponse> => {
+const deleteUserPet = async (authHeader: string, body: { petId: string }): Promise<ApiResponse> => {
     const { petId } = body;
 
     const response = await fetch(`/api/users/pets/delete?petId=${petId}`, {
@@ -178,5 +200,6 @@ export {
     updateUserProfile,
     deleteUserPet,
     updateUserPet,
-    addUserPet
+    addUserPet,
+    fetchUserFriends
 }
