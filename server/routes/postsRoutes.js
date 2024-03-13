@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postsController = require('../controllers/postsController');
+const { isAuthenticated } = require('../middleware/authHandler');
 
 
 // Accessible to 
