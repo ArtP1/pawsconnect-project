@@ -28,7 +28,6 @@ interface PetCreationBody {
   description: string;
   breed: string;
   color: string;
-  owner_id: string;  
 }
 
 export type {

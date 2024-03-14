@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import "./css/navmenu.css";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
 import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
 import { SVGProps } from "react";

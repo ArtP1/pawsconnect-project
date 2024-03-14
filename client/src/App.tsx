@@ -1,8 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import { PetsPage } from '@/pages/PetsPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { SignUpPage } from "./pages/SignUp";
-import { PetsViewPage } from "./pages/petsView";
 import { FeedPage } from "./pages/FeedPage";
 import { FriendsPage } from "./pages/FriendsPage";
 import { GuestPage } from "./pages/GuestPage";
@@ -32,10 +30,8 @@ function App() {
         {/* All public routes */}
         <Route path="/guests" element={<GuestPage />}></Route>
         <Route path="/explore" element={<GuestsExplorePage />}></Route>
-        <Route path="/pets" element={<PetsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/petsView" element={<PetsViewPage />} />
       </Routes>
     </>
   );

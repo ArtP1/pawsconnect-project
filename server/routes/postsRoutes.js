@@ -5,9 +5,10 @@ const { isAuthenticated } = require('../middleware/authHandler');
 
 
 // Accessible to 
-router.get('/', postsController.getPosts);
-router.get('/p/:post_id', postsController.getPostById);
-router.get('/:user_id', postsController.getPostsByUserId);
-router.post('/posts/createPost', isAuthenticated, postsController.createPost);
+router.get('/', isAuthenticated, postsController.getPosts);
+router.get('/p/:post_id', isAuthenticated, postsController.getPostById);
+router.get('/:user_id', isAuthenticated, postsController.getPostsByUserId);
+
+router.post('/create', isAuthenticated, postsController.createPost);
 
 module.exports = router;

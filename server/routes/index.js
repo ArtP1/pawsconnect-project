@@ -8,7 +8,7 @@ const { isAuthenticated } = require('../middleware/authHandler');
 
 router.use('/users', usersRoutes);
 router.use('/pets', petsRoutes);
-router.use('/posts', isAuthenticated, postsRoutes);
+router.use('/posts', postsRoutes);
 
 
 module.exports = router;

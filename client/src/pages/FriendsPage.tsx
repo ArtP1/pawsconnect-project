@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { AvatarImage, Avatar } from "@/components/ui/avatar"
 import { CardContent, Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import useUser from "@/hooks/useUsers"
+import useUser from "@/hooks/useUser"
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { User } from '@/models/userModel';
 
@@ -50,15 +50,15 @@ export const FriendsPage = () => {
                                             <Card key={user.user_id} className="cursor-pointer">
                                                 <CardContent className="flex flex-col space-y-4 p-5">
                                                     <div className="flex flex-col items-center space-y-4">
-                                                        <Avatar className="h-[60px] w-[60px]">
+                                                        <Avatar className="h-[75px] w-[75px] rounded">
                                                             <AvatarImage
                                                                 className="object-cover"
                                                                 alt={`${user.first_name} ${user.last_name}`}
                                                                 src={user.profile_pic} />
                                                         </Avatar>
-                                                        <div className="w-full">
+                                                        <div className="flex flex-col items-center w-full">
                                                             <h3 className="text-lg font-semibold">{user.first_name} {user.last_name}</h3>
-                                                            <p className="text-sm text-gray-500 dark:text-gray-400 w-full break-words">@{user.username}</p><br />
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 w-full break-words">@{user.username}</p>
                                                             <p className="text-sm text-gray-500 dark:text-gray-400 w-4/5 break-words">{user.location}</p>
                                                         </div>
                                                     </div>

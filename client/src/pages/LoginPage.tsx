@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
-import useUser from '@/hooks/useUsers';
+import useUser from '@/hooks/useUser';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');

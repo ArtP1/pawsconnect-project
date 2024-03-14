@@ -21,10 +21,8 @@ interface UserProfileUpdateBody {
   nPrefLang: string;
 }
 
-interface UserSignUp
-  extends Omit<
-    User,
-    "user_id" | "profile_pic" | "location" | "preferred_lang"
-  > { }
+
+interface UserSignUp extends Omit<User, "user_id" | "profile_pic" | "location" | "preferred_lang"> { }
+
 
 export type { User, UserProfileUpdateBody, UserSignUp };

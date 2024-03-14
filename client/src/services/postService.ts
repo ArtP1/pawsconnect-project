@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/models/apiModel";
 import { PostCreationBody } from "@/models/postModel";
 
+
 const fetchPosts = async (authHeader: string): Promise<ApiResponse> => {
     const response = await fetch("/api/posts", {
         method: "GET",
@@ -15,7 +16,8 @@ const fetchPosts = async (authHeader: string): Promise<ApiResponse> => {
     return data;
 };
 
-const fetchPostsByUserId = async (authHeader: string, user_id: number): Promise<ApiResponse> => {
+
+const fetchUserPosts = async (authHeader: string, user_id: number): Promise<ApiResponse> => {
     const response = await fetch(`/api/posts/${user_id}`, {
         method: "GET",
         headers: {
@@ -29,10 +31,12 @@ const fetchPostsByUserId = async (authHeader: string, user_id: number): Promise<
     return data;
 };
 
+
 const createPost = async (authHeader: string, body: PostCreationBody): Promise<ApiResponse> => {
     const response = await fetch("/api/posts/create", {
         method: 'POST',
         headers: {
+            "Content-Type": "application/json",
             'Authorization': `${authHeader}`
         },
         body: JSON.stringify(body)
@@ -43,8 +47,9 @@ const createPost = async (authHeader: string, body: PostCreationBody): Promise<A
     return data;
 };
 
+
 export {
     fetchPosts,
-    fetchPostsByUserId,
+    fetchUserPosts,
     createPost
 };

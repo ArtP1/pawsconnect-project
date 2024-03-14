@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Link, useNavigate } from "react-router-dom";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
-import useUser from '@/hooks/useUsers';
+import useUser from '@/hooks/useUser';
 
 interface InputError {
   type: string,

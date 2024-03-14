@@ -8,12 +8,7 @@ interface Post {
     updated_at: string;
 }
 
-interface PostCreationBody {
-    user_id: number;
-    content: string;
-    caption: string;
-    visibility: string;
-}
+interface PostCreationBody extends Omit<Post, "post_id" | "user_id" | "created_at" | "updated_at"> { }
 
 
 export type {Post, PostCreationBody};

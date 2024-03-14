@@ -1,5 +1,6 @@
 const { catchAsync } = require('../config/utils'); 
 const postsModel = require('../models/postsModel');
+const { sendResponse } = require('../config/responseHandler');
 
 
 const postsController = {
@@ -18,14 +19,16 @@ const postsController = {
         sendResponse(res, 200, true, post, "Post retrieved successfully");
     }),
     createPost: catchAsync(async (req, res) => {
-        const { user_id, content, caption, visibility } = req.body;
-        const newPost = await postsModel.createPost(user_id, content, caption, visibility);
+        const { id } = req.user;
+        const { content, caption, visibility } = req.body;
+
+        const newPost = await postsModel.createPost(id, content, caption, visibility);
     
         if (!newPost) {
             return sendResponse(res, 500, false, null, "Failed to create post. Please try again.");
         }
     
-        sendResponse(res, 201, true, newPost, "Post created successfully.");
+        sendResponse(res, 201, true, null, "Post created successfully.");
     })
     
 }
