@@ -1,10 +1,10 @@
 import React from 'react';
 import Graph from 'graphology';
-import { SigmaContainer, useLoadGraph } from '@react-sigma/core';
-import useUser from '@/hooks/useUsers';
-import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
-import { User } from '@/models/userModel';
 import '@react-sigma/core/lib/react-sigma.min.css';
+import { SigmaContainer, useLoadGraph } from '@react-sigma/core';
+import { User } from '@/models/userModel';
+import useUser from '@/hooks/useUser';
+import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 
 const LoadGraph = ({ userFriends }: { userFriends: User[] }) => {
     const loadGraph = useLoadGraph();

@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 
 
 const usersController = {
-    getUsers: catchAsync(async (req, res) => {
+    getAllUsers: catchAsync(async (req, res) => {
         const users = await usersModel.getUsers();
         sendResponse(res, 200, true, users, "Users retrieved successfully");
     }),
@@ -29,11 +29,6 @@ const usersController = {
         }
 
         sendResponse(res, 200, true, userWithoutPassword, "User retrieved successfully");
-    }),
-    getUserFriendsById: catchAsync(async (req, res) => {
-        const { id } = req.params;
-        const userFriends = await usersModel.getUserFriendsById(id);
-        sendResponse(res, 200, true, userFriends, "User friends retrieved succesfully");
     }),
     signup: catchAsync(async (req, res) => {
         // This method doesn't require error handling as the 'userValidation' middelware takes care of it
@@ -65,7 +60,6 @@ const usersController = {
     
         sendResponse(res, 200, true, { id: user[0].user_id, accessToken: accessToken, refreshToken: refreshToken }, "Login successful. Welcome back!");
     }),
-    
     updateProfile: catchAsync(async (req, res) => {
         const { id } = req.user;
         const { nFirstName, nLastName, nEmail, nProfilePicture, nLocation, nPrefLang } = req.body;
@@ -77,54 +71,6 @@ const usersController = {
         }
         
         sendResponse(res, 200, true, null, "Profile updated successfully");
-    }),
-    getUserPets: catchAsync(async (req, res) => {
-        const { id } = req.user;
-        
-        const pets = await usersModel.getUserPets(id);
-
-        if(pets.length == 0) {
-            return sendResponse(res, 200, false, null, "No pets found for the user");
-        }
-
-        sendResponse(res, 200, true, { pets }, "User pets retrieved successfully");
-    }),
-    updateUserPet: catchAsync(async (req, res) => {
-        const { petId, nName, nAge, nProfilePic, nDescription, nBreed, nColor } = req.body;
-
-        const updatedPet = await usersModel.updateUserPet(nName, nAge, nProfilePic, nDescription, nBreed, nColor, petId);
-
-        if(!updatedPet) {
-            return sendResponse(res, 404, false, null, "Pet not found or update failed.");
-        }
-
-        sendResponse(res, 200, true, updatedPet, "Pet updated successfully.");
-    }),
-    addUserPet: catchAsync(async (req, res) => {
-        const { id } = req.user;
-        console.log(req.body);
-        const {name, age, profile_pic, description, breed, color } = req.body;
-    
-      
-        const addedPet = await usersModel.addUserPet(name, age, profile_pic, description, breed, color, id);
-    
-        if(!addedPet) {
-            return sendResponse(res, 404, false, {}, "Pet not added successfully.");
-        }
-    
-        sendResponse(res, 200, true, addedPet, "Pet added successfully.");
-    }),
-
-    deleteUserPet: catchAsync(async (req, res) => {
-        const { petId } = req.query;
-
-        const deletedPet = await usersModel.deleteUserPet(petId);
-
-        if (!deletedPet) {
-            return sendResponse(res, 404, false, null, "Pet not found or failed to be deleted. If the problem persists, contact support for assistance.");
-        }
-
-        sendResponse(res, 200, true, null, "User pet deleted successfully");
     }),
     refreshToken: catchAsync(async (req, res) => {
         const { id } = req.user;

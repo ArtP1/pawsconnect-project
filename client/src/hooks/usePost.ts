@@ -1,12 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchPosts, fetchPostsByUserId, createPost } from "@/services/postService";
-import { Post } from "@/models/postModel";
+import { fetchPosts, fetchUserPosts, createPost } from "@/services/postService";
+import { Post, PostCreationBody } from "@/models/postModel";
+
 
 const usePost = (authHeader?: string) => {
     const [posts, setPosts] = useState<Post[]>([]);
+
     const [loadingPosts, setLoadingPosts] = useState(false);
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [isAlert, setIsAlert] = useState(false);
+
+    const clearNotifications = useCallback(() => {
+        setError("");
+        setSuccess("");
+      }, []);
+    
 
     const refreshPosts = useCallback(async () => {
         if (!authHeader) return;
@@ -23,11 +33,12 @@ const usePost = (authHeader?: string) => {
         setLoadingPosts(false);
     }, [authHeader]);
 
+
     const refreshPostsByUserId = useCallback(async (userId: number) => {
         if (!authHeader) return;
 
         setLoadingPosts(true);
-        const resp = await fetchPostsByUserId(authHeader, userId);
+        const resp = await fetchUserPosts(authHeader, userId);
 
         if (resp.success) {
             setPosts(resp.data);
@@ -38,38 +49,45 @@ const usePost = (authHeader?: string) => {
         setLoadingPosts(false);
     }, [authHeader]);
 
+    
     useEffect(() => {
         refreshPosts();
     }, [authHeader, refreshPosts]);
 
-    const addNewPost = async (postBody: Omit<Post, 'post_id' | 'created_at' | 'updated_at'>) => {
+
+    const addUserPost = async (postBody: PostCreationBody) => {
+        clearNotifications();
+
+        console.log("In addUserPost");
         if (!authHeader) return;
 
         setLoadingPosts(true);
-        setError("");
-        setSuccess("");
-
         const resp = await createPost(authHeader, postBody);
 
         if (resp.success) {
-            await refreshPosts();
-            setSuccess("Post created successfully!");
+            // await refreshPosts();
+            setIsAlert(true);
+            setTimeout(() => setIsAlert(false), 3000);
+            setSuccess(resp.message);
         } else {
-            setError(resp.message || "Failed to create post");
+            setError(resp.message);
         }
 
         setLoadingPosts(false);
     };
+
 
     return {
         posts,
         loadingPosts,
         error,
         success,
+        isAlert,
         refreshPosts,
         refreshPostsByUserId,
-        addNewPost,
+        addUserPost
     };
 };
+
 
 export default usePost;

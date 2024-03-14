@@ -27,12 +27,10 @@ const postsModel = {
         return await executeQuery('SELECT * FROM \"posts\" WHERE post_id = $1', [id]);
         // Expected output: https://drive.google.com/file/d/1qyBEF2dbcKtMBNQOzsVgYmhyFdwkrfug/view?usp=drive_link
     },
-    createPost: async (user_id, content, caption, visibility) => {
-        const result = await executeQuery(`
-        INSERT INTO posts (user_id, content, caption, visibility, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        RETURNING *;
-    `, [user_id, content, caption, visibility]);
+    createPost: async (userId, content, caption, visibility) => {
+        const result = await executeQuery(`INSERT INTO \"posts\" (user_id, content, caption, visibility) VALUES ($1, $2, $3, $4) 
+                                           RETURNING *`, 
+                                           [userId, content, caption, visibility]);
         return result.length > 0;
     }
 }
