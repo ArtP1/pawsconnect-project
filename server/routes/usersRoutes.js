@@ -1,5 +1,7 @@
+
 const express = require('express');
 const usersController = require('../controllers/usersController');
+
 const router = express.Router();
 const { validateUserSignup, validateUserProfileUpdate } = require('../middleware/validation/userValidation');
 const loginLimiter = require('../middleware/rateLimit');
@@ -9,7 +11,7 @@ const { isAuthenticated } = require('../middleware/authHandler');
 // Accessbile to the public
 router.post('/signup', validateUserSignup, usersController.signup);
 router.post('/login', loginLimiter, usersController.login);
-
+router.get('/:email',usersController.getUserByEmailId);
 
 // Accessible to Members only
 router.get('/profile', isAuthenticated, usersController.getUserById);

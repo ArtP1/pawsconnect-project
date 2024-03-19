@@ -44,6 +44,7 @@ const usersModel = {
         // Expected output: https://drive.google.com/file/d/12hq6UpLz78d1w5LiWApQErBwspnFLKec/view?usp=drive_link
     },
     getUserByEmail: async(email) => {
+        console.log(email);
         return await executeQuery(`SELECT * FROM \"users\" WHERE email = $1`, [email]);
     },
     createUser: async(firstName, lastName, username, email, hashedPassword) => {

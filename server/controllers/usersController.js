@@ -1,6 +1,7 @@
 const { catchAsync } = require('../config/utils');
 const usersModel = require('../models/usersModel');
 const bcrypt = require('bcryptjs');
+//const nodemailer=require('');
 const { SALT_ROUNDS, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRES_IN, 
         REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRES_IN } = require('../config/configs').security;
 const { sendResponse } = require('../config/responseHandler');
@@ -29,6 +30,19 @@ const usersController = {
         }
 
         sendResponse(res, 200, true, userWithoutPassword, "User retrieved successfully");
+    }),
+    getUserByEmailId: catchAsync(async (req, res) => {
+        const  {email}  = req.params;
+
+        const user = await usersModel.getUserByEmail(email);
+console.log(user.length);
+        const {password, ...userWithoutPassword} = user;
+        if(user.length < 1) {
+            return sendResponse(res, 404, false, {}, "User not found");
+        }
+        //code for nodemailer
+        //send link 'http://localhost:5173/update-password' to email
+        sendResponse(res, 200, true, userWithoutPassword,  "User retrieved successfully");
     }),
     signup: catchAsync(async (req, res) => {
         // This method doesn't require error handling as the 'userValidation' middelware takes care of it

@@ -3,6 +3,7 @@ import { ApiResponse } from "@/models/apiModel";
 import { UserSignUp } from "@/models/userModel";
 
 
+
 const loginUser = async (email: string, password: string): Promise<ApiResponse> => {
     const response = await fetch("/api/users/login", {
         method: 'POST',
@@ -94,12 +95,52 @@ const fetchUserFriends = async (authHeader: string): Promise<ApiResponse> => {
     const data = await response.json();
     return data;
 }
+const forgotPassword = async (email: string): Promise<ApiResponse> => {
+    
+    const response = await fetch("/api/users/"+email, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
 
+    if (!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
+
+    const data = await response.json();
+    if(!data){
+    const errorData = await response.json();
+        return errorData;
+    }
+    return data;
+
+};
+const updatePassword = async (email: string): Promise<ApiResponse> => {
+    const response = await fetch("/api/users/"+email, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+}
 
 export {
     loginUser,
     signupUser,
     fetchUserProfile,
     updateUserProfile,
-    fetchUserFriends
+    fetchUserFriends,
+    forgotPassword,
+    updatePassword,
 }

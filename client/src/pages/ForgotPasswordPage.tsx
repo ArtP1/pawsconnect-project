@@ -1,18 +1,25 @@
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import useUser from "@/hooks/useUser";
 
 export const ForgotPasswordPage = () => {
+  const { forgot_Password, error } = useUser();
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Add logic here to handle form submission and initiate password reset process
     console.log("Submitting email:", email);
     // Reset email field after submission
+    const resp = await forgot_Password(email);
+    if(error)
+      alert('Unexpected Error');
     setEmail("");
+    if (resp?.success === true) alert("Password reset link sent to you email");
+    else alert("User with this email Id does not exist");
   };
 
   return (
@@ -53,4 +60,4 @@ export const ForgotPasswordPage = () => {
       </div>
     </div>
   );
-}
+};

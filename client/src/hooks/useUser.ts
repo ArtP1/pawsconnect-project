@@ -3,8 +3,10 @@ import {
     fetchUserProfile,
     fetchUserFriends,
     updateUserProfile,
+    forgotPassword,
     loginUser,
     signupUser,
+    updatePassword,
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
@@ -75,6 +77,26 @@ const useUser = (authHeader?: string) => {
         }
     };
 
+    const forgot_Password = async (email: string) => {
+        const response= await forgotPassword(email);
+        if(response.success){
+            return response;
+        }else{
+            setError(response.message);
+        }
+        
+    }
+
+    const update_Password = async (email: string) => {
+        const response= await updatePassword(email);
+        if(response.success){
+            return response;
+        }else{
+            setError(response.message);
+        }
+        
+    }
+
     const signup = async (signUpBody: UserSignUp) => {
         return await signupUser(signUpBody);
     };
@@ -112,6 +134,8 @@ const useUser = (authHeader?: string) => {
         refreshUserFriends,
         updateProfile,
         isAlert,
+        forgot_Password,
+        update_Password
     };
 };
 

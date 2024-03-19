@@ -3,6 +3,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { SignUpPage } from "./pages/SignUp";
 import { FeedPage } from "./pages/FeedPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { UpdatePasswordPage } from "./pages/UpdatePasswordPage";
 import { FriendsPage } from "./pages/FriendsPage";
 import { GuestPage } from "./pages/GuestPage";
 import { UserSettings } from "./pages/UserSettings";
@@ -34,6 +35,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={< ForgotPasswordPage/>} />
+        <Route path="/update-password" element={< UpdatePasswordPage/>} />
+
       </Routes>
     </>
   );
