@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import useSignIn from "react-auth-kit/hooks/useSignIn";
 import useUser from '@/hooks/useUser';
-
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
