@@ -5,18 +5,23 @@ import {
     updateUserProfile,
     loginUser,
     signupUser,
+    fetchUserMessages
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
 import { UserSignUp } from "@/models/userModel";
-
+import { UserConvMessage } from "@/models/messageModel";
 
 const useUser = (authHeader?: string) => {
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
+    const [userMessages, setUserMessages] = useState<UserConvMessage[]>([]);
+
 
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingFriends, setLoadingFriends] = useState(false);
+    const [loadingMessages, setLoadingMessages] = useState(false);
+
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -27,6 +32,7 @@ const useUser = (authHeader?: string) => {
         setError("");
         setSuccess("");
     }, []);
+
 
     const refreshUserProfile = useCallback(async () => {
         if (!authHeader) return;
@@ -43,11 +49,13 @@ const useUser = (authHeader?: string) => {
         setLoadingProfile(false);
     }, [authHeader]);
 
+
     const refreshUserFriends = useCallback(async () => {
         if (!authHeader) return;
 
         setLoadingFriends(true);
         const resp = await fetchUserFriends(authHeader);
+
         if (resp.success) {
             setUserFriends(resp.data);
         } else {
@@ -57,10 +65,31 @@ const useUser = (authHeader?: string) => {
         setLoadingFriends(false);
     }, [authHeader]);
 
+
+    const refreshUserMessages = useCallback(async () => {
+        if (!authHeader) return;
+
+        setLoadingMessages(true);
+        const resp = await fetchUserMessages(authHeader);
+
+        console.log(resp.data);
+        
+        if (resp.success) {
+            setUserMessages(resp.data);
+        } else {
+            setError(resp.message);
+        }
+
+        setLoadingMessages(false);
+    }, [authHeader]);
+
+
     useEffect(() => {
         refreshUserProfile();
         refreshUserFriends();
-    }, [authHeader, refreshUserProfile, refreshUserFriends]);
+        refreshUserMessages();
+    }, [authHeader, refreshUserProfile, refreshUserFriends, refreshUserMessages]);
+
 
     const login = async (email: string, password: string) => {
         setLoadingProfile(true);
@@ -75,9 +104,11 @@ const useUser = (authHeader?: string) => {
         }
     };
 
+
     const signup = async (signUpBody: UserSignUp) => {
         return await signupUser(signUpBody);
     };
+
 
     const updateProfile = async (updateBody: UserProfileUpdateBody) => {
         clearNotifications();
@@ -97,19 +128,23 @@ const useUser = (authHeader?: string) => {
         }
 
         setLoadingProfile(false);
-    };
+    };  
+    
 
     return {
         login,
         signup,
         userProfile,
         userFriends,
+        userMessages,
         loadingProfile,
         loadingFriends,
+        loadingMessages,
         error,
         success,
         refreshUserProfile,
         refreshUserFriends,
+        refreshUserMessages,
         updateProfile,
         isAlert,
     };

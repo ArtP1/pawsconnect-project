@@ -7,7 +7,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { FiMessageSquare } from "react-icons/fi";
 import { FaUserFriends } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Footer } from '@/components/Footer';
 import { Button } from "@/components/ui/button"
 import { DialogTrigger, DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogContent, Dialog } from "@/components/ui/dialog"
@@ -28,6 +28,7 @@ interface AuthenticatedLayoutProps {
 
 export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ children }) => {
     const authHeader = useAuthHeader();
+    const location = useLocation();
 
     const [postContent, setPostContent] = useState("");
     const [postCaption, setPostCaption] = useState("");
@@ -64,6 +65,18 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
         }
     };
 
+    
+    const routeMap: { [key: string]: string } = {
+        '/': 'Home',
+        '/friends': 'Friends',
+        '/messages': 'Messages',
+        '/notifications': 'Notifications',
+        '/connections': 'Network'
+    };
+
+    const getPageTitle = () => {
+        return routeMap[location.pathname] || 'N/A';
+    };
 
 
     return (
@@ -80,8 +93,10 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
                 )}
 
                 <div className="flex flex-col border-r w-full md:w-56 sticky top-0">
+
                     <div className="flex h-[90px] justify-center items-center border-b">
-                        <span className="h-fit">Feed</span>
+
+                        <span className="h-fit">{getPageTitle()}</span>
                     </div>
 
                     <nav className="flex-grow p-4 space-y-7 overflow-auto">
@@ -96,7 +111,7 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
 
                         <Link
                             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
-                            to="#">
+                            to="/messages">
                             <FiMessageSquare className="h-5 w-5" />
                             <span>Messages</span>
                         </Link>
@@ -132,10 +147,6 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
                                     className="grid gap-4 py-4"
                                     onSubmit={(e) => {
                                         e.preventDefault();
-
-                                        console.log(`Content: \n ${postContent}\n`);
-                                        console.log(`Caption: \n ${postCaption}\n`);
-                                        console.log(`Visibility: \n ${postVisibility}\n`);
 
                                         addUserPost({
                                             content: postContent,

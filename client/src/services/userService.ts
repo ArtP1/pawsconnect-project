@@ -96,10 +96,30 @@ const fetchUserFriends = async (authHeader: string): Promise<ApiResponse> => {
 }
 
 
+const fetchUserMessages = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch("/api/users/messages", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        }
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        return errorData;
+    }
+
+    const data = await response.json();
+    return data;
+}
+
+
 export {
     loginUser,
     signupUser,
     fetchUserProfile,
     updateUserProfile,
-    fetchUserFriends
+    fetchUserFriends,
+    fetchUserMessages
 }

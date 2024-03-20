@@ -25,10 +25,21 @@ const usersController = {
         const {password, ...userWithoutPassword} = user;
 
         if(!user) {
-            return sendResponse(res, 404, false, {}, "User not found");
+            return sendResponse(res, 404, false, null, "User not found");
         }
 
         sendResponse(res, 200, true, userWithoutPassword, "User retrieved successfully");
+    }),
+    getUserMessages: catchAsync(async (req, res) => {
+        const { id } = req.user;
+
+        const messages = await usersModel.getUserMessages(id);
+
+        if(messages.length == 0) {
+            return sendResponse(res, 404, false, null, "User messages not found");
+        }
+
+        sendResponse(res, 200, true, messages, "User messages retrieved successfully");
     }),
     signup: catchAsync(async (req, res) => {
         // This method doesn't require error handling as the 'userValidation' middelware takes care of it

@@ -12,6 +12,7 @@ interface User {
   updated_at?: EpochTimeStamp;
 }
 
+
 interface UserProfileUpdateBody {
   nFirstName: string;
   nLastName: string;

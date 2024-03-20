@@ -1,9 +1,12 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { formatDistanceToNow } from "date-fns";
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
 
 export const compressImage = (imageDataUrl: string): Promise<string> => {
   const maxWidth = 250;
@@ -50,4 +53,24 @@ export const compressImage = (imageDataUrl: string): Promise<string> => {
 
     img.src = imageDataUrl;
   });
+};
+
+
+// NPM packet source: https://www.npmjs.com/package/date-fns
+// Developer page docs source: https://date-fns.org/docs/Getting-Started
+export const formatMsgDate = (date: Date | string): string => {
+  const now = new Date();
+  const messageDate = new Date(date);
+
+  if (now.getDate() === messageDate.getDate() &&
+    now.getMonth() === messageDate.getMonth() &&
+    now.getFullYear() === messageDate.getFullYear()) {
+    return formatDistanceToNow(messageDate, { addSuffix: true });
+  } else {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(messageDate);
+  }
 };

@@ -28,6 +28,7 @@
     "@react-sigma/core": "^3.4.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "date-fns": "^3.6.0",
     "graphology": "^0.25.4",
     "graphology-types": "^0.24.7",
     "jwt-decode": "^4.0.0",
