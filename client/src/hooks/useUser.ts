@@ -5,22 +5,21 @@ import {
     updateUserProfile,
     loginUser,
     signupUser,
-    fetchUserMessages
+    fetchUserId
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
 import { UserSignUp } from "@/models/userModel";
-import { UserConvMessage } from "@/models/messageModel";
+
 
 const useUser = (authHeader?: string) => {
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
-    const [userMessages, setUserMessages] = useState<UserConvMessage[]>([]);
+    const [userId, setUserId] = useState<number | null>(null);
 
 
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingFriends, setLoadingFriends] = useState(false);
-    const [loadingMessages, setLoadingMessages] = useState(false);
 
 
     const [error, setError] = useState("");
@@ -66,29 +65,23 @@ const useUser = (authHeader?: string) => {
     }, [authHeader]);
 
 
-    const refreshUserMessages = useCallback(async () => {
+    const retrieveAndSetUserId = useCallback(async () => {
         if (!authHeader) return;
 
-        setLoadingMessages(true);
-        const resp = await fetchUserMessages(authHeader);
+        const resp = await fetchUserId(authHeader); 
 
-        console.log(resp.data);
-        
         if (resp.success) {
-            setUserMessages(resp.data);
+            setUserId(resp.data); 
         } else {
             setError(resp.message);
         }
-
-        setLoadingMessages(false);
     }, [authHeader]);
 
 
     useEffect(() => {
         refreshUserProfile();
         refreshUserFriends();
-        refreshUserMessages();
-    }, [authHeader, refreshUserProfile, refreshUserFriends, refreshUserMessages]);
+    }, [authHeader, refreshUserProfile, refreshUserFriends]);
 
 
     const login = async (email: string, password: string) => {
@@ -129,22 +122,21 @@ const useUser = (authHeader?: string) => {
 
         setLoadingProfile(false);
     };  
-    
+
 
     return {
         login,
         signup,
         userProfile,
         userFriends,
-        userMessages,
+        userId,
         loadingProfile,
         loadingFriends,
-        loadingMessages,
         error,
         success,
         refreshUserProfile,
         refreshUserFriends,
-        refreshUserMessages,
+        retrieveAndSetUserId,
         updateProfile,
         isAlert,
     };

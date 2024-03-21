@@ -8,6 +8,10 @@ const jwt = require("jsonwebtoken");
 
 
 const usersController = {
+    getUserId: catchAsync(async (req, res) => {
+        const { id } = req.user;
+        sendResponse(res, 200, true, id, null);
+    }),
     getAllUsers: catchAsync(async (req, res) => {
         const users = await usersModel.getUsers();
         sendResponse(res, 200, true, users, "Users retrieved successfully");
@@ -30,16 +34,26 @@ const usersController = {
 
         sendResponse(res, 200, true, userWithoutPassword, "User retrieved successfully");
     }),
-    getUserMessages: catchAsync(async (req, res) => {
+    getUserConvos: catchAsync(async (req, res) => {
         const { id } = req.user;
 
-        const messages = await usersModel.getUserMessages(id);
+        const convos = await usersModel.getUserConvos(id);
 
-        if(messages.length == 0) {
+        if(convos.length == 0) {
             return sendResponse(res, 404, false, null, "User messages not found");
         }
 
-        sendResponse(res, 200, true, messages, "User messages retrieved successfully");
+        console.log(convos[0]);
+        
+        sendResponse(res, 200, true, convos, "User messages retrieved successfully");
+    }),
+    getConvoMessages: catchAsync(async (req, res) => {
+        const { otherUserId } = req.params;
+        const { id } = req.user;
+
+        const convoMessages = await usersModel.getUserConvoMsgs(id, otherUserId);
+
+        sendResponse(res, 200, true, convoMessages, "User conversation messages retrieved successfully");
     }),
     signup: catchAsync(async (req, res) => {
         // This method doesn't require error handling as the 'userValidation' middelware takes care of it

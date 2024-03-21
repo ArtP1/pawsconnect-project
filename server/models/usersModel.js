@@ -57,41 +57,63 @@ const usersModel = {
       email,
     ]);
   },
-  getUserMessages: async (id) => {
+  getUserConvos: async (id) => {
     return await executeQuery(
-    `
-        WITH RankedMessages AS (
+      `
+        WITH LastMessages AS (
+          SELECT
+            sender_id,
+            receiver_id,
+            message_txt,
+            timestamp, 
+            CASE 
+                WHEN sender_id = $1 THEN 'sent'
+                ELSE 'received'
+            END AS message_direction
+          FROM (
             SELECT 
-                m.msg_id, 
-                m.sender_id, 
-                m.receiver_id, 
-                m.message_txt,
-                m.timestamp, 
-                m.is_read, 
-                u.username AS receiver_username, 
-                u.profile_pic AS receiver_profile_pic,
-                ROW_NUMBER() OVER (
-                    PARTITION BY CASE WHEN m.sender_id = $1 THEN m.receiver_id ELSE m.sender_id END 
-                    ORDER BY m.timestamp DESC
-                ) AS rn 
-            FROM "messages" m 
-            JOIN users u ON m.receiver_id = u.user_id 
-            WHERE m.sender_id = $1 OR m.receiver_id = $1
+                sender_id,
+                receiver_id,
+                message_txt,
+                timestamp,
+                ROW_NUMBER() OVER (PARTITION BY least(sender_id, receiver_id), greatest(sender_id, receiver_id) ORDER BY timestamp DESC) AS rn
+            FROM Messages
+            WHERE sender_id = $1 OR receiver_id = $1
+          ) msg_filtered
+          WHERE msg_filtered.rn = 1
         )
         SELECT 
-            msg_id, 
-            sender_id, 
-            receiver_id, 
-            message_txt, 
-            timestamp, 
-            is_read, 
-            receiver_username, 
-            receiver_profile_pic 
-        FROM RankedMessages 
-        WHERE rn = 1 
-        ORDER BY timestamp DESC
+          u.user_id AS receiver_id,
+          u.username AS receiver_username,
+          u.profile_pic AS receiver_profile_pic,
+          lm.message_txt,
+          lm.message_direction,
+          lm.timestamp 
+        FROM LastMessages lm
+        JOIN Users u ON u.user_id = CASE 
+                                      WHEN lm.sender_id = $1 THEN lm.receiver_id
+                                      ELSE lm.sender_id
+                                    END
+        ORDER BY lm.timestamp DESC;
     `,
       [id]
+    );
+  },
+  getUserConvoMsgs: async (userId, otherUserId) => {
+    return await executeQuery(
+      `
+        SELECT
+          m.msg_id,
+          m.sender_id,
+          m.receiver_id,
+          m.message_txt,
+          m.timestamp,
+          m.is_read
+        FROM \"messages\" m
+        WHERE (m.sender_id = $1 AND m.receiver_id = $2) OR (m.sender_id = $2 AND m.receiver_id = $1)
+        ORDER BY m.timestamp ASC
+      `,
+      [userId, otherUserId]
     );
   },
   createUser: async (firstName, lastName, username, email, hashedPassword) => {

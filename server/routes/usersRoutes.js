@@ -12,8 +12,10 @@ router.post('/login', loginLimiter, usersController.login);
 
 
 // Accessible to Members only
+router.get('/id', isAuthenticated, usersController.getUserId)
 router.get('/profile', isAuthenticated, usersController.getUserById);
-router.get('/messages', isAuthenticated, usersController.getUserMessages)
+router.get('/convos', isAuthenticated, usersController.getUserConvos)
+router.get('/convo/messages/:otherUserId', isAuthenticated, usersController.getConvoMessages)
 
 // Middleware order matters, in this instance we first check that the user is authenticated, and then we perform the validation
 // router.post('/profile/update', isAuthenticated, validateUserProfileUpdate, usersController.updateProfile);

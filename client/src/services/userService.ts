@@ -96,8 +96,8 @@ const fetchUserFriends = async (authHeader: string): Promise<ApiResponse> => {
 }
 
 
-const fetchUserMessages = async (authHeader: string): Promise<ApiResponse> => {
-    const response = await fetch("/api/users/messages", {
+const fetchUserConvos = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch("/api/users/convos", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -115,11 +115,41 @@ const fetchUserMessages = async (authHeader: string): Promise<ApiResponse> => {
 }
 
 
+const fetchUserConvoMsgs = async (authHeader: string, otherUserId: number): Promise<ApiResponse> => {
+    const response = await fetch(`/api/users/convo/messages/${otherUserId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
+const fetchUserId = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch(`/api/users/id`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
 export {
     loginUser,
     signupUser,
     fetchUserProfile,
     updateUserProfile,
     fetchUserFriends,
-    fetchUserMessages
+    fetchUserConvos,
+    fetchUserConvoMsgs,
+    fetchUserId
 }

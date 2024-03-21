@@ -9,8 +9,9 @@ interface Message {
 
 
 interface UserConvMessage extends Message {
-    receiver_username?: string;
-    receiver_profile_pic?: string;
+    receiver_username: string;
+    receiver_profile_pic: string;
+    message_direction: 'sent' | 'received';
 }
 
 
