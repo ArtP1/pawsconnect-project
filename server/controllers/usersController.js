@@ -13,7 +13,24 @@ const usersController = {
         sendResponse(res, 200, true, id, null);
     }),
     getAllUsers: catchAsync(async (req, res) => {
-        const users = await usersModel.getUsers();
+        const { usage } = req.query;
+        const { id } = req.user;
+
+        let users;
+
+        switch(usage) {
+            case 'search':
+                users = await usersModel.getUsersForMemberSearch(id);
+                break;
+            default:
+                break;
+        }
+
+        // console.log(users);
+        if(!users || users.length == 0) {
+            return sendResponse(res, 404, false, null, "No users found");
+        }
+
         sendResponse(res, 200, true, users, "Users retrieved successfully");
     }),
     getFriends: catchAsync(async (req, res) => {
@@ -39,12 +56,10 @@ const usersController = {
 
         const convos = await usersModel.getUserConvos(id);
 
-        if(convos.length == 0) {
+        if(convos.length === 0) {
             return sendResponse(res, 404, false, null, "User messages not found");
         }
 
-        console.log(convos[0]);
-        
         sendResponse(res, 200, true, convos, "User messages retrieved successfully");
     }),
     getConvoMessages: catchAsync(async (req, res) => {
@@ -96,6 +111,45 @@ const usersController = {
         }
         
         sendResponse(res, 200, true, null, "Profile updated successfully");
+    }),
+    createConvo: catchAsync(async (req, res) => {
+        const { id } = req.user;
+        const { nReceiverId, nMsgText } = req.body;
+        const currentTimestamp = new Date();
+
+        const convo = await usersModel.createConvo(id, nReceiverId);
+
+        /*
+            This still needs work, specifically for when the conversation already exists, then the
+            action would be to identify that here and then return a response that we can use to 
+            differentiate between a new conversation and an existing one
+        */
+        const message = await usersModel.createMsg(convo[0].convo_id, id, nReceiverId, nMsgText);
+        const linkMsg = await usersModel.linkNewMsgToConvo(message[0].msg_id, currentTimestamp, convo[0].convo_id);
+    
+        sendResponse(res, 200, true, null, "Conversation was created successfully");
+    }),
+    createMsg: catchAsync(async (req, res) => {
+        const nSenderId = req.user.id;
+        const { convoId, nReceiverId, nMsgText } = req.body;
+        const currentTimestamp = new Date();
+
+        const message = await usersModel.createMsg(convoId, nSenderId, nReceiverId, nMsgText);
+        const linkMsg = await usersModel.linkNewMsgToConvo(message[0].msg_id, currentTimestamp, convoId);
+
+        sendResponse(res, 200, true, null, "Message was created successfully");
+    }),
+    updateMsgsReadState: catchAsync(async (req, res) => {
+        const currentUserId = req.user.id;
+        const { convoId } = req.body;
+
+        const updatedMsgs = await usersModel.updateMsgsReadState(convoId, currentUserId);
+
+        if(!updatedMsgs) {
+            return sendResponse(res, 200, false, "No unread messages found");
+        }
+
+        sendResponse(res, 200, true, null, "Message(s) have been marked as read");
     }),
     refreshToken: catchAsync(async (req, res) => {
         const { id } = req.user;

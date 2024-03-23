@@ -96,39 +96,6 @@ const fetchUserFriends = async (authHeader: string): Promise<ApiResponse> => {
 }
 
 
-const fetchUserConvos = async (authHeader: string): Promise<ApiResponse> => {
-    const response = await fetch("/api/users/convos", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `${authHeader}`
-        }
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        return errorData;
-    }
-
-    const data = await response.json();
-    return data;
-}
-
-
-const fetchUserConvoMsgs = async (authHeader: string, otherUserId: number): Promise<ApiResponse> => {
-    const response = await fetch(`/api/users/convo/messages/${otherUserId}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `${authHeader}`
-        }
-    });
-
-    const data = await response.json();
-    return data;
-}
-
-
 const fetchUserId = async (authHeader: string): Promise<ApiResponse> => {
     const response = await fetch(`/api/users/id`, {
         method: "GET",
@@ -143,13 +110,26 @@ const fetchUserId = async (authHeader: string): Promise<ApiResponse> => {
 }
 
 
+const fetchAllUsersForSearch = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch("/api/users?usage=search", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        },
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
 export {
     loginUser,
     signupUser,
     fetchUserProfile,
     updateUserProfile,
     fetchUserFriends,
-    fetchUserConvos,
-    fetchUserConvoMsgs,
-    fetchUserId
+    fetchUserId,
+    fetchAllUsersForSearch
 }

@@ -14,7 +14,7 @@ interface IUserData {
 }
 
 const refresh = createRefresh<IUserData>({
-  interval: 10,
+  interval: 60,
   refreshApiCallback: async (param) => {
     try {
       const response = await fetch("/api/users/refresh", {
@@ -36,8 +36,8 @@ const refresh = createRefresh<IUserData>({
       return {
         isSuccess: true,
         newAuthToken: data.token,
-        newAuthTokenExpireIn: 10,
-        newRefreshTokenExpiresIn: 60
+        newAuthTokenExpireIn: 60,
+        newRefreshTokenExpiresIn: 1440
       }
     }
     catch (error) {

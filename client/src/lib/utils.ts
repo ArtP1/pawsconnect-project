@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { formatDistanceToNow } from "date-fns";
+import { differenceInMinutes, differenceInHours, differenceInDays, differenceInWeeks, differenceInYears } from 'date-fns';
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -62,15 +62,23 @@ export const formatMsgDate = (date: Date | string): string => {
   const now = new Date();
   const messageDate = new Date(date);
 
-  if (now.getDate() === messageDate.getDate() &&
-    now.getMonth() === messageDate.getMonth() &&
-    now.getFullYear() === messageDate.getFullYear()) {
-    return formatDistanceToNow(messageDate, { addSuffix: true });
+  const diffMinutes = differenceInMinutes(now, messageDate);
+  const diffHours = differenceInHours(now, messageDate);
+  const diffDays = differenceInDays(now, messageDate);
+  const diffWeeks = differenceInWeeks(now, messageDate);
+  const diffYears = differenceInYears(now, messageDate);
+
+  if (diffMinutes < 1) {
+    return 'now';
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes}m ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours}h ago`;
+  } else if (diffDays < 7) {
+    return `${diffDays}d ago`;
+  } else if (diffWeeks < 52) {
+    return `${diffWeeks}w ago`;
   } else {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(messageDate);
+    return `${diffYears}y ago`;
   }
 };

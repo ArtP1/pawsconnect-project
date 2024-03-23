@@ -5,7 +5,8 @@ import {
     updateUserProfile,
     loginUser,
     signupUser,
-    fetchUserId
+    fetchUserId,
+    fetchAllUsersForSearch
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
@@ -15,8 +16,8 @@ import { UserSignUp } from "@/models/userModel";
 const useUser = (authHeader?: string) => {
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
-    const [userId, setUserId] = useState<number | null>(null);
-
+    const [userId, setUserId] = useState('');
+    const [allUsersForSearch, setAllUsersForSearch] = useState<User[]>([]); 
 
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingFriends, setLoadingFriends] = useState(false);
@@ -65,7 +66,7 @@ const useUser = (authHeader?: string) => {
     }, [authHeader]);
 
 
-    const retrieveAndSetUserId = useCallback(async () => {
+    const retrieveAndSetUserId = async () => {
         if (!authHeader) return;
 
         const resp = await fetchUserId(authHeader); 
@@ -75,12 +76,13 @@ const useUser = (authHeader?: string) => {
         } else {
             setError(resp.message);
         }
-    }, [authHeader]);
+    };
 
 
     useEffect(() => {
         refreshUserProfile();
         refreshUserFriends();
+        retrieveAndSetUserId();
     }, [authHeader, refreshUserProfile, refreshUserFriends]);
 
 
@@ -110,7 +112,7 @@ const useUser = (authHeader?: string) => {
 
         setLoadingProfile(true);
         const resp = await updateUserProfile(authHeader, updateBody);
-        console.log(resp.message);
+
         if (resp.success) {
             setUserProfile(resp.data);
             setIsAlert(true);
@@ -123,12 +125,27 @@ const useUser = (authHeader?: string) => {
         setLoadingProfile(false);
     };  
 
+    const getAllUsersForSearch = useCallback(async () => {
+        if(!authHeader) return;
 
+        const resp = await fetchAllUsersForSearch(authHeader);
+        
+        if(resp.success) {
+            setAllUsersForSearch(resp.data);
+        } else {
+            setError(resp.message);
+        }
+
+    }, [authHeader]);
+
+
+    
     return {
         login,
         signup,
         userProfile,
         userFriends,
+        allUsersForSearch,
         userId,
         loadingProfile,
         loadingFriends,
@@ -137,6 +154,7 @@ const useUser = (authHeader?: string) => {
         refreshUserProfile,
         refreshUserFriends,
         retrieveAndSetUserId,
+        getAllUsersForSearch,
         updateProfile,
         isAlert,
     };

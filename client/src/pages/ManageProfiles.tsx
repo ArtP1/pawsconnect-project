@@ -54,6 +54,7 @@ export const ManageProfiles = () => {
     isAlert: userIsAlert,
   } = useUser(`${authHeader}`);
 
+
   const {
     userPets,
     updatePet,
@@ -93,7 +94,6 @@ export const ManageProfiles = () => {
 
 
   useEffect(() => {
-    // handles user profile prefill
     if (userProfile) {
       setProfilePicture(userProfile.profile_pic || "");
       setFirstName(userProfile.first_name || "");
@@ -106,7 +106,6 @@ export const ManageProfiles = () => {
   }, [userProfile]);
 
 
-  // A generalized image upload and compression handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setImage: React.Dispatch<React.SetStateAction<string>>, currentImageURL?: string) => {
     const file = e.target.files?.[0];
     if (file) {
