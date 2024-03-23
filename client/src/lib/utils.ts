@@ -1,9 +1,12 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { differenceInMinutes, differenceInHours, differenceInDays, differenceInWeeks, differenceInYears } from 'date-fns';
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
 
 export const compressImage = (imageDataUrl: string): Promise<string> => {
   const maxWidth = 250;
@@ -50,4 +53,32 @@ export const compressImage = (imageDataUrl: string): Promise<string> => {
 
     img.src = imageDataUrl;
   });
+};
+
+
+// NPM packet source: https://www.npmjs.com/package/date-fns
+// Developer page docs source: https://date-fns.org/docs/Getting-Started
+export const formatMsgDate = (date: Date | string): string => {
+  const now = new Date();
+  const messageDate = new Date(date);
+
+  const diffMinutes = differenceInMinutes(now, messageDate);
+  const diffHours = differenceInHours(now, messageDate);
+  const diffDays = differenceInDays(now, messageDate);
+  const diffWeeks = differenceInWeeks(now, messageDate);
+  const diffYears = differenceInYears(now, messageDate);
+
+  if (diffMinutes < 1) {
+    return 'now';
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes}m ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours}h ago`;
+  } else if (diffDays < 7) {
+    return `${diffDays}d ago`;
+  } else if (diffWeeks < 52) {
+    return `${diffWeeks}w ago`;
+  } else {
+    return `${diffYears}y ago`;
+  }
 };

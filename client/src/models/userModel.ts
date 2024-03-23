@@ -8,9 +8,10 @@ interface User {
   profile_pic: string;
   location: string;
   preferred_lang?: string;
-  created_at?: EpochTimeStamp;
-  updated_at?: EpochTimeStamp;
+  created_at?: string;
+  updated_at?: string;
 }
+
 
 interface UserProfileUpdateBody {
   nFirstName: string;
@@ -25,4 +26,13 @@ interface UserProfileUpdateBody {
 interface UserSignUp extends Omit<User, "user_id" | "profile_pic" | "location" | "preferred_lang"> { }
 
 
-export type { User, UserProfileUpdateBody, UserSignUp };
+interface UserSignUp extends Omit<User, "user_id" | "profile_pic" | "location" | "preferred_lang"> { }
+
+
+interface UserSnippet extends Omit<User, "email" | "password" | "location" | "preferred_lang"> { }
+
+
+export type { User, 
+              UserProfileUpdateBody, 
+              UserSignUp, 
+              UserSnippet };

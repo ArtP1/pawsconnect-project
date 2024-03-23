@@ -96,10 +96,40 @@ const fetchUserFriends = async (authHeader: string): Promise<ApiResponse> => {
 }
 
 
+const fetchUserId = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch(`/api/users/id`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        }
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
+const fetchAllUsersForSearch = async (authHeader: string): Promise<ApiResponse> => {
+    const response = await fetch("/api/users?usage=search", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        },
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
 export {
     loginUser,
     signupUser,
     fetchUserProfile,
     updateUserProfile,
-    fetchUserFriends
+    fetchUserFriends,
+    fetchUserId,
+    fetchAllUsersForSearch
 }

@@ -5,6 +5,8 @@ import {
     updateUserProfile,
     loginUser,
     signupUser,
+    fetchUserId,
+    fetchAllUsersForSearch
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
@@ -14,10 +16,16 @@ import { UserSignUp } from "@/models/userModel";
 const useUser = (authHeader?: string) => {
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
+  
+  
+    const [userId, setUserId] = useState('');
+    const [allUsersForSearch, setAllUsersForSearch] = useState<User[]>([]); 
 
+  
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingFriends, setLoadingFriends] = useState(false);
 
+  
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [isAlert, setIsAlert] = useState(false);
@@ -27,6 +35,7 @@ const useUser = (authHeader?: string) => {
         setError("");
         setSuccess("");
     }, []);
+
 
     const refreshUserProfile = useCallback(async () => {
         if (!authHeader) return;
@@ -43,11 +52,13 @@ const useUser = (authHeader?: string) => {
         setLoadingProfile(false);
     }, [authHeader]);
 
+
     const refreshUserFriends = useCallback(async () => {
         if (!authHeader) return;
 
         setLoadingFriends(true);
         const resp = await fetchUserFriends(authHeader);
+
         if (resp.success) {
             setUserFriends(resp.data);
         } else {
@@ -57,11 +68,26 @@ const useUser = (authHeader?: string) => {
         setLoadingFriends(false);
     }, [authHeader]);
 
+    const retrieveAndSetUserId = async () => {
+        if (!authHeader) return;
+
+        const resp = await fetchUserId(authHeader); 
+
+        if (resp.success) {
+            setUserId(resp.data); 
+        } else {
+            setError(resp.message);
+        }
+    };
+
+
     useEffect(() => {
         refreshUserProfile();
         refreshUserFriends();
+        retrieveAndSetUserId();
     }, [authHeader, refreshUserProfile, refreshUserFriends]);
 
+  
     const login = async (email: string, password: string) => {
         setLoadingProfile(true);
         const response = await loginUser(email, password);
@@ -75,9 +101,11 @@ const useUser = (authHeader?: string) => {
         }
     };
 
+  
     const signup = async (signUpBody: UserSignUp) => {
         return await signupUser(signUpBody);
     };
+
 
     const updateProfile = async (updateBody: UserProfileUpdateBody) => {
         clearNotifications();
@@ -86,7 +114,7 @@ const useUser = (authHeader?: string) => {
 
         setLoadingProfile(true);
         const resp = await updateUserProfile(authHeader, updateBody);
-        console.log(resp.message);
+
         if (resp.success) {
             setUserProfile(resp.data);
             setIsAlert(true);
@@ -97,19 +125,37 @@ const useUser = (authHeader?: string) => {
         }
 
         setLoadingProfile(false);
-    };
+    };  
+
+    const getAllUsersForSearch = useCallback(async () => {
+        if(!authHeader) return;
+
+        const resp = await fetchAllUsersForSearch(authHeader);
+        
+        if(resp.success) {
+            setAllUsersForSearch(resp.data);
+        } else {
+            setError(resp.message);
+        }
+
+    }, [authHeader]);
+  
 
     return {
         login,
         signup,
         userProfile,
         userFriends,
+        allUsersForSearch,
+        userId,
         loadingProfile,
         loadingFriends,
         error,
         success,
         refreshUserProfile,
         refreshUserFriends,
+        retrieveAndSetUserId,
+        getAllUsersForSearch,
         updateProfile,
         isAlert,
     };

@@ -66,6 +66,18 @@ export const ManageProfiles = () => {
   } = usePet(`${authHeader}`);
 
 
+  const {
+    userPets,
+    updatePet,
+    deletePet,
+    addNewPet,
+    loadingPets,
+    error: petsError,
+    success: petsSuccess,
+    isAlert: petsIsAlert,
+  } = usePet(`${authHeader}`);
+
+
   const [profilePicture, setProfilePicture] = useState("");
   const [firstName, setFirstName] = useState("");
   const [username, setUsername] = useState("");
@@ -83,7 +95,7 @@ export const ManageProfiles = () => {
   const [petBreed, setPetBreed] = useState("");
   const [petColor, setPetColor] = useState("");
 
-
+  
   const [newPetName, setNewPetName] = useState("");
   const [newPetAge, setNewPetAge] = useState(0);
   const [newPetProfilePicture, setNewPetProfilePicture] = useState("");
@@ -93,7 +105,6 @@ export const ManageProfiles = () => {
 
 
   useEffect(() => {
-    // handles user profile prefill
     if (userProfile) {
       setProfilePicture(userProfile.profile_pic || "");
       setFirstName(userProfile.first_name || "");
@@ -106,7 +117,6 @@ export const ManageProfiles = () => {
   }, [userProfile]);
 
 
-  // A generalized image upload and compression handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setImage: React.Dispatch<React.SetStateAction<string>>, currentImageURL?: string) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -140,6 +150,7 @@ export const ManageProfiles = () => {
       {petsError && petsIsAlert && (
         <DynamicAlert type="error" title="Error" description={petsError} />
       )}
+
       {petsSuccess && petsIsAlert && (
         <DynamicAlert type="success" title="Success" description={petsSuccess} />
       )}
