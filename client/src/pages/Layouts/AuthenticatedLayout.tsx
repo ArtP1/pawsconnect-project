@@ -21,6 +21,7 @@ import { compressImage } from '@/lib/utils';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { DynamicAlert } from '@/components/custom-components/dynamic-alert';
 
+
 interface AuthenticatedLayoutProps {
     children: React.ReactNode;
 }
@@ -74,6 +75,7 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
         '/connections': 'Network'
     };
 
+  
     const getPageTitle = () => {
         return routeMap[location.pathname] || 'N/A';
     };

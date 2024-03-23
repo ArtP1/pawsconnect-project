@@ -26,7 +26,6 @@ const usersController = {
                 break;
         }
 
-        // console.log(users);
         if(!users || users.length == 0) {
             return sendResponse(res, 404, false, null, "No users found");
         }

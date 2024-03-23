@@ -26,6 +26,9 @@ interface UserProfileUpdateBody {
 interface UserSignUp extends Omit<User, "user_id" | "profile_pic" | "location" | "preferred_lang"> { }
 
 
+interface UserSignUp extends Omit<User, "user_id" | "profile_pic" | "location" | "preferred_lang"> { }
+
+
 interface UserSnippet extends Omit<User, "email" | "password" | "location" | "preferred_lang"> { }
 
 

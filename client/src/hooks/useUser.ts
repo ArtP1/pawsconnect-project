@@ -16,13 +16,16 @@ import { UserSignUp } from "@/models/userModel";
 const useUser = (authHeader?: string) => {
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
+  
+  
     const [userId, setUserId] = useState('');
     const [allUsersForSearch, setAllUsersForSearch] = useState<User[]>([]); 
 
+  
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingFriends, setLoadingFriends] = useState(false);
 
-
+  
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [isAlert, setIsAlert] = useState(false);
@@ -65,7 +68,6 @@ const useUser = (authHeader?: string) => {
         setLoadingFriends(false);
     }, [authHeader]);
 
-
     const retrieveAndSetUserId = async () => {
         if (!authHeader) return;
 
@@ -85,7 +87,7 @@ const useUser = (authHeader?: string) => {
         retrieveAndSetUserId();
     }, [authHeader, refreshUserProfile, refreshUserFriends]);
 
-
+  
     const login = async (email: string, password: string) => {
         setLoadingProfile(true);
         const response = await loginUser(email, password);
@@ -99,7 +101,7 @@ const useUser = (authHeader?: string) => {
         }
     };
 
-
+  
     const signup = async (signUpBody: UserSignUp) => {
         return await signupUser(signUpBody);
     };
@@ -137,9 +139,8 @@ const useUser = (authHeader?: string) => {
         }
 
     }, [authHeader]);
+  
 
-
-    
     return {
         login,
         signup,
