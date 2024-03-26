@@ -20,6 +20,10 @@ router.post('/create/convo', isAuthenticated, usersController.createConvo);
 router.post('/convo/messages/read', isAuthenticated, usersController.updateMsgsReadState);
 router.get('/convo/messages/:otherUserId', isAuthenticated, usersController.getConvoMessages);
 router.post('/create/msg', isAuthenticated, usersController.createMsg);
+router.get('/notifications', isAuthenticated, usersController.getNotifications);
+// router.post('/notifications/read', isAuthenticated, usersController.updateNotificationReadState);
+// router.post('/notifications/create', isAuthenticated, usersController.createNotification);
+
 
 // Middleware order matters, in this instance we first check that the user is authenticated, and then we perform the validation
 // router.post('/profile/update', isAuthenticated, validateUserProfileUpdate, usersController.updateProfile);

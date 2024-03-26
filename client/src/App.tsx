@@ -9,6 +9,7 @@ import { GuestsExplorePage } from "./pages/GuestsExplorePage";
 import { AuthenticatedLayout } from "./pages/Layouts/AuthenticatedLayout";
 import { NetworkGraph } from "./pages/NetworkGraph";
 import { MessagesPage } from "./pages/MessagesPage";
+import { Notifications } from "./pages/Notifications";
 import './App.css'
 import AuthOutlet from "@auth-kit/react-router/AuthOutlet";
 
@@ -27,7 +28,7 @@ function App() {
           <Route path="/accounts/edit" element={<UserSettings />}></Route>
           <Route path="/connections" element={<AuthenticatedLayout><NetworkGraph/></AuthenticatedLayout>}></Route>
           <Route path="/messages" element={<AuthenticatedLayout><MessagesPage/></AuthenticatedLayout>}></Route>
-
+          <Route path="/notifications" element={<AuthenticatedLayout><Notifications/></AuthenticatedLayout>}></Route>
         </Route>
 
         {/* All public routes */}

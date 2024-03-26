@@ -113,6 +113,13 @@ const usersModel = {
       [userId, otherUserId]
     );
   },
+  getUserNotifications: async (id) => {
+    return await executeQuery(`
+      SELECT noti_id, title, sub_heading, content, type, is_read, created_at FROM \"notifications\" 
+      WHERE receiver_id = $1`,
+      [id]
+    );
+  },
   createUser: async (firstName, lastName, username, email, hashedPassword) => {
     return await executeQuery(
       `

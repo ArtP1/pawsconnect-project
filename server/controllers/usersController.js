@@ -69,6 +69,17 @@ const usersController = {
 
         sendResponse(res, 200, true, convoMessages, "User conversation messages retrieved successfully");
     }),
+    getNotifications: catchAsync(async (req, res) => {
+        const { id } = req.user;
+
+        const notifications = await usersModel.getUserNotifications(id);
+
+        if(notifications.length === 0) {
+            return sendResponse(res, 404, false, null, "No notifications found");
+        }
+
+        sendResponse(res, 200, true, notifications, "User notifications retrieved successfully");
+    }),
     signup: catchAsync(async (req, res) => {
         // This method doesn't require error handling as the 'userValidation' middelware takes care of it
         const { firstName, lastName, username, email, password } = req.body;
