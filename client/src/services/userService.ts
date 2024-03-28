@@ -124,6 +124,21 @@ const fetchAllUsersForSearch = async (authHeader: string): Promise<ApiResponse> 
 }
 
 
+const acceptFriendReq = async (authHeader: string, body: { requesterId: string, notiId: string }): Promise<ApiResponse> => {
+    const response = await fetch(`/api/users/friends/accept`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
 export {
     loginUser,
     signupUser,
@@ -131,5 +146,6 @@ export {
     updateUserProfile,
     fetchUserFriends,
     fetchUserId,
-    fetchAllUsersForSearch
+    fetchAllUsersForSearch,
+    acceptFriendReq
 }

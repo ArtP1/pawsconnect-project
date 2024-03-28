@@ -1,4 +1,4 @@
-.accordion-trigger {
+.notification {
   padding-top: 1rem;
   padding-bottom: 1rem;
   display: grid;
@@ -7,9 +7,10 @@
   text-align: left;
   gap: 1rem;
   width: 100%;
+  border-bottom: 1px solid #d1d5db;
 }
 
-.front-labels {
+.labels {
   display: grid;
   gap: 0.25rem;
   width: 100%;
@@ -26,6 +27,11 @@
   font-weight: 500;
 }
 
+.user-ref {
+  text-decoration: solid underline;
+  color: blue;
+}
+
 .sub-heading {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -35,6 +41,11 @@
   font-size: 0.75rem;
   line-height: 1rem;
   color: #9ca3af;
+}
+
+
+.accept {
+  margin-right: 5px;
 }
 
 .content {
@@ -48,7 +59,11 @@
   color: #6b7280;
 }
 
-.info {
+.info,
+.post-l,
+.post-c,
+.f-request,
+.t-request {
   color: blue;
 }
 

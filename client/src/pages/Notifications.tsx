@@ -5,6 +5,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Notification } from '@/components/custom-components/Notification/Notification';
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import useNotifications from "@/hooks/useNotifications";
+import { CiFaceSmile } from "react-icons/ci";
 
 
 export const Notifications = () => {
@@ -21,8 +22,12 @@ export const Notifications = () => {
                 <Separator />
 
                 {notifications.length === 0 ? (
-                    <CardContent className="flex h-full p-0 justify-center items-center">
-                        <p className="w-fit h-fit">No notifications available</p>
+                    <CardContent className="flex flex-col h-full p-0 justify-center items-center">
+                        <CiFaceSmile className="h-12 w-12 text-gray-500" />
+                        <div className="text-gray-400">
+                            <p>All caught up!</p>
+                            <p> No new notifications at the moment.</p>
+                        </div>
                     </CardContent>
                 ) : (
                     <CardContent className="divide-y divide-gray dark:divide-gray-800 max-h-full">
@@ -31,22 +36,12 @@ export const Notifications = () => {
                             type="hover"
                             scrollHideDelay={75}>
 
-                            <Accordion
-                                collapsible
-                                type="single">
+                            {notifications.map((notification) => (
+                                <Notification
+                                    key={notification.noti_id}
+                                    {...notification} />
+                            ))}
 
-                                {notifications.map((notification) => (
-                                    <Notification
-                                        noti_id={notification.noti_id}
-                                        title={notification.title}
-                                        sub_heading={notification.sub_heading}
-                                        content={notification.content}
-                                        type={notification.type}
-                                        is_read={notification.is_read}
-                                        created_at={notification.created_at} />
-                                ))}
-
-                            </Accordion>
                         </ScrollArea>
                     </CardContent>
                 )}

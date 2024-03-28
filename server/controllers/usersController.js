@@ -161,6 +161,19 @@ const usersController = {
 
         sendResponse(res, 200, true, null, "Message(s) have been marked as read");
     }),
+    acceptFriendRequest: catchAsync(async (req, res) => {
+        const { id } = req.user;
+        const { requesterId, notiId } = req.body;
+
+        const friendRequest = await usersModel.acceptFriendRequest(id, requesterId);
+        const remoteFriendReqNotification = await usersModel.deleteFriendRequestNotification(notiId);
+
+        if(!friendRequest && !remoteFriendReqNotification) {
+            return sendResponse(res, 200, false, null, "Friend request could not be accepted. Please try again later.");
+        }
+
+        sendResponse(res, 200, true, null, "Friend request accepted successfully");
+    }),
     refreshToken: catchAsync(async (req, res) => {
         const { id } = req.user;
 

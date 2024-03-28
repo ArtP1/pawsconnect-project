@@ -32,10 +32,11 @@ const useNotifications = (authHeader?: string) => {
 
     useEffect(() => {
         refreshNotifications();
-    }, [refreshNotifications]);
+    }, [authHeader, refreshNotifications]);
 
 
     return {
+        refreshNotifications,
         notifications,
         error,
         success,
