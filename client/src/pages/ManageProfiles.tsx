@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -33,18 +33,29 @@ import {
   Dialog,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import useUser from "@/hooks/useUser";
-import usePet from "@/hooks/usePet";
-import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { DynamicAlert } from "@/components/custom-components/dynamic-alert";
 import { Pet } from "@/models/petModel";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { compressImage } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Badge } from "@/components/ui/badge"
+import { Combobox } from '@headlessui/react';
+import { UserSnippet } from "@/models/userModel";
+import { HiOutlineSelector } from "react-icons/hi";
+import { IoCheckmark } from "react-icons/io5";
+import useUser from "@/hooks/useUser";
+import usePet from "@/hooks/usePet";
+import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
+
 
 export const ManageProfiles = () => {
   const authHeader = useAuthHeader();
 
-  // Necessary imports
+
   const {
     userProfile,
     updateProfile,
@@ -52,6 +63,9 @@ export const ManageProfiles = () => {
     error: userError,
     success: userSuccess,
     isAlert: userIsAlert,
+    allUsersForSearch,
+    getAllUsersForSearch,
+    initiatePetTransferReq
   } = useUser(`${authHeader}`);
 
 
@@ -91,6 +105,18 @@ export const ManageProfiles = () => {
   const [newPetDescription, setNewPetDescription] = useState("");
   const [newPetBreed, setNewPetBreed] = useState("");
   const [newPetColor, setNewPetColor] = useState("");
+
+
+  const [petTransferReqReceiver, setPetTransferReqReceiver] = useState<UserSnippet | null>(null);
+
+
+  const [query, setQuery] = useState('');
+
+
+  const filteredUsers = allUsersForSearch.filter(user => {
+    const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+    return fullName.includes(query.toLowerCase());
+  });
 
 
   useEffect(() => {
@@ -435,12 +461,13 @@ export const ManageProfiles = () => {
                   </form>
                 </DialogContent>
               </Dialog>
-
-
               <div className="grid grid-cols-3 gap-10 w-full">
                 {/* Loops through the list of pets and assigns each a Card and other components */}
                 {userPets.map((pet, index) => (
-                  <Card key={index} className="w-full max-w-sm shadow-lg">
+                  <Card key={index} className="w-full max-w-sm shadow-lg relative">
+                    {pet.is_pending_transfer && (
+                      <Badge className="absolute top-0 right-0 mt-4 mr-4">In Transfer</Badge>
+                    )}
                     <CardHeader>
                       <CardTitle>{pet.name}</CardTitle>
                       <CardDescription>
@@ -473,7 +500,7 @@ export const ManageProfiles = () => {
                               setPetColor(pet.color);
                             }}
                           >
-                            Edit Pet
+                            Edit
                           </Button>
                         </DialogTrigger>
 
@@ -619,7 +646,7 @@ export const ManageProfiles = () => {
                             className="shadow-lg"
                             size="sm"
                           >
-                            Delete Pet
+                            Delete
                           </Button>
                         </AlertDialogTrigger>
 
@@ -641,6 +668,106 @@ export const ManageProfiles = () => {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+
+                      {!pet.is_pending_transfer && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              onClick={async () => getAllUsersForSearch()}>
+                              Transfer
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <form
+                              id="petTransferForm"
+                              className="grid gap-4"
+                              onSubmit={(e) => {
+                                e.preventDefault();
+
+                                if (petTransferReqReceiver) {
+                                  initiatePetTransferReq(petTransferReqReceiver.user_id, pet.pet_id);
+                                }
+                              }}>
+                              <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Pet Transfer Form</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  Select the user you're transfering this pet to.
+                                </p>
+                              </div>
+                              <div className="grid gap-2">
+                                <div className="grid grid-cols-3 items-center gap-4">
+                                  <Label htmlFor="width">User</Label>
+                                  <Combobox
+                                    className="col-span-3"
+                                    as="div"
+                                    value={petTransferReqReceiver}
+                                    onChange={setPetTransferReqReceiver}>
+
+                                    <div className="relative mt-1">
+                                      <Combobox.Input
+                                        className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        displayValue={(user: UserSnippet) => user ? `${user.first_name} ${user.last_name}` : ''}
+                                        onChange={(event) => setQuery(event.target.value)}
+                                        placeholder='Search...'
+                                        required />
+
+                                      <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <HiOutlineSelector className="w-5 h-5 text-gray-400" aria-hidden="true" />
+                                      </Combobox.Button>
+
+                                      {filteredUsers.length > 0 && (
+                                        <Combobox.Options
+                                          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                          {filteredUsers.map((user) => (
+                                            <Combobox.Option
+                                              key={user.user_id}
+                                              value={user}
+                                              as={Fragment}>
+                                              {({ active, selected }) => (
+                                                <li
+                                                  className={`flex items-center cursor-pointer select-none py-2 pl-3 pr-9 ${active ? 'bg-blue-600 text-white' : 'text-gray-900'}`}>
+                                                  <Avatar className="h-8 w-8 cursor-pointer rounded-full mr-3">
+                                                    <AvatarImage
+                                                      alt="User Profile"
+                                                      src={user.profile_pic}
+                                                      className="object-cover" />
+                                                    <AvatarFallback>
+                                                      {user.first_name && user.first_name.length > 0
+                                                        ? user.first_name[0].toUpperCase()
+                                                        : ""}
+                                                      {user.last_name && user.last_name.length > 0
+                                                        ? user.last_name[0].toUpperCase()
+                                                        : ""}
+                                                    </AvatarFallback>
+                                                  </Avatar>
+                                                  <div>
+                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                      @{user.username}
+                                                    </span>
+                                                    <span className={`block truncate text-xs ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                      {`${user.first_name} ${user.last_name}`}
+                                                    </span>
+                                                  </div>
+                                                  {selected && (
+                                                    <IoCheckmark className="w-4 h-4 absolute right-3" aria-hidden="true" />
+                                                  )}
+                                                </li>
+                                              )}
+                                            </Combobox.Option>
+                                          ))}
+                                        </Combobox.Options>
+                                      )}
+                                    </div>
+                                  </Combobox>
+                                </div>
+                                <Button type="submit">Send request</Button>
+                              </div>
+                            </form>
+                          </PopoverContent>
+                        </Popover>
+                      )}
+
                     </CardFooter>
                   </Card>
                 ))}

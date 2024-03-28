@@ -90,16 +90,14 @@ const usePet = (authHeader?: string) => {
 
 
   const addNewPet = async (petBody: PetCreationBody) => {
-    if (!authHeader) return; // Ensure there's an authentication header
+    if (!authHeader) return;
 
     setLoadingPets(true);
     clearNotifications();
 
-    // Correctly pass authHeader and petBody as two separate arguments
     const resp = await addUserPet(authHeader, petBody);
 
     if (resp.success) {
-      // Optionally refresh the list of user pets after successfully adding a new pet
       await refreshUserPets();
       setIsAlert(true);
       setTimeout(() => setIsAlert(false), 3000);

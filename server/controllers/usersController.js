@@ -174,6 +174,21 @@ const usersController = {
 
         sendResponse(res, 200, true, null, "Friend request accepted successfully");
     }),
+    createPetTransferReq: catchAsync(async (req, res) => {
+        const currPetOwnerId = req.user.id;
+        const { nextOwnerId, petId } = req.body;
+
+        const transferRequest = await usersModel.createPetTransferReq(petId, currPetOwnerId, nextOwnerId);
+        const createPetTransReqNoti = await usersModel.createPetTransReqNoti(nextOwnerId, currPetOwnerId, petId);
+
+        console.log(createPetTransReqNoti);
+
+        if(!transferRequest && !createPetTransReqNoti) {
+            return sendResponse(res, 200, false, null, "Pet transfer request could not be created. Please try again later.");
+        }
+
+        sendResponse(res, 200, true, null, "Pet transfer request created successfully");
+    }),
     refreshToken: catchAsync(async (req, res) => {
         const { id } = req.user;
 
