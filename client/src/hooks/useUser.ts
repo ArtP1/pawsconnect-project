@@ -7,17 +7,15 @@ import {
     signupUser,
     fetchUserId,
     fetchAllUsersForSearch,
-    acceptFriendReq
-} from "@/services/userService"; // adjust the import path as needed
+    acceptFriendReq,
+    createPetTransferReq
+} from "@/services/userService"; 
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
 import { UserSignUp } from "@/models/userModel";
-import useNotifications from "./useNotifications";
+
 
 const useUser = (authHeader?: string) => {
-    const { refreshNotifications } = useNotifications(`${authHeader}`);
-
-
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
   
@@ -152,7 +150,19 @@ const useUser = (authHeader?: string) => {
 
         if(resp.success) {
             setSuccess(resp.message);
-            refreshNotifications();
+        } else {
+            setError(resp.message);
+        }
+    }
+
+
+    const initiatePetTransferReq = async (nextOwnerId: string, petId: string) => {
+        if(!authHeader) return;
+
+        const resp = await createPetTransferReq(authHeader, { nextOwnerId, petId});
+
+        if(resp.success) {
+            setSuccess(resp.message);
         } else {
             setError(resp.message);
         }
@@ -171,6 +181,7 @@ const useUser = (authHeader?: string) => {
         error,
         success,
         refreshUserProfile,
+        initiatePetTransferReq,
         refreshUserFriends,
         retrieveAndSetUserId,
         getAllUsersForSearch,

@@ -6,6 +6,7 @@ interface Pet {
   description: string;
   breed: string;
   color: string;
+  is_pending_transfer?: boolean;
 }
 
 interface PetProfileUpdateBody {
@@ -29,6 +30,7 @@ interface PetCreationBody {
   breed: string;
   color: string;
 }
+
 
 export type {
   Pet,

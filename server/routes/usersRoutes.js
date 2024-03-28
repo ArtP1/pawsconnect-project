@@ -30,6 +30,7 @@ router.get('/notifications', isAuthenticated, usersController.getNotifications);
 router.post('/profile/update', isAuthenticated, usersController.updateProfile);
 router.get('/friends', isAuthenticated, usersController.getFriends);
 router.post('/friends/accept', isAuthenticated, usersController.acceptFriendRequest);
+router.post('/pet/transfer', isAuthenticated, usersController.createPetTransferReq);
 
 // Used to refresh JWT token 
 router.post('/refresh', isAuthenticated, usersController.refreshToken);

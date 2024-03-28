@@ -46,7 +46,25 @@ const petsModel = {
         return result.length > 0;
     },
     getOwnerPets: async(id) => {
-        return await executeQuery('SELECT pet_id, name, age, profile_pic, description, breed, color FROM \"pets\" WHERE owner_id = $1', [id]);
+        return await executeQuery(`
+            SELECT
+                p.pet_id,
+                p.name,
+                p.age,
+                p.profile_pic,
+                p.description,
+                p.breed,
+                p.color,
+                EXISTS (
+                    SELECT 1
+                    FROM \"pettransferrequests\" ptr
+                    WHERE ptr.pet_id = p.pet_id
+                      AND ptr.status = 'pending'
+                ) AS is_pending_transfer
+            FROM \"pets\" p
+            WHERE p.owner_id = $1;`,
+            [id]
+        );
     }
 }
 

@@ -26,7 +26,8 @@ const usersModel = {
     return await executeQuery(`SELECT * FROM \"users\"`);
   },
   getUsersForMemberSearch: async (id) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT user_id, first_name, last_name, username, profile_pic
       FROM \"users\"
       WHERE user_id <> $1`,
@@ -34,7 +35,8 @@ const usersModel = {
     );
   },
   getFriends: async (id) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT u.user_id, u.first_name, u.last_name, u.username, u.profile_pic, u.location 
       FROM \"users\" u
       JOIN \"userrelationships\" ur ON u.user_id = ur.friend_id 
@@ -43,7 +45,8 @@ const usersModel = {
     );
   },
   getUserById: async (id) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT * FROM \"users\" 
       WHERE user_id = $1`,
       [id]
@@ -55,18 +58,21 @@ const usersModel = {
     ]);
   },
   getUserFriendsById: async (id) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT * FROM \"userrelationships\" 
       WHERE user_id = $1`,
       [id]
     );
   },
   getUserByEmail: async (email) => {
-    return await executeQuery(`SELECT * FROM \"users\" WHERE email = $1`, 
-    [email]);
+    return await executeQuery(`SELECT * FROM \"users\" WHERE email = $1`, [
+      email,
+    ]);
   },
   getUserConvos: async (id) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT
         c.convo_id,
         u.user_id AS receiver_id,
@@ -93,7 +99,8 @@ const usersModel = {
     );
   },
   getUserConvoMsgs: async (userId, otherUserId) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT
         m.msg_id,
         m.sender_id,
@@ -108,7 +115,8 @@ const usersModel = {
     );
   },
   getUserNotifications: async (id) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       SELECT 
         n.noti_id, 
         n.title, 
@@ -132,28 +140,32 @@ const usersModel = {
     );
   },
   createUser: async (firstName, lastName, username, email, hashedPassword) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       INSERT INTO \"users\" (first_name, last_name, username, email, password) 
       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [firstName, lastName, username, email, hashedPassword]
     );
   },
   createConvo: async (nSender, nReceiver) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       INSERT INTO \"conversations\" (participant_one , participant_two) 
       VALUES ($1, $2) RETURNING *`,
       [nSender, nReceiver]
     );
   },
   createMsg: async (convoId, nSender, nReceiver, nMsgTxt) => {
-    return await executeQuery(`
+    return await executeQuery(
+      `
       INSERT INTO \"messages\" (convo_id, sender_id, receiver_id, message_txt)
       VALUES ($1, $2, $3, $4) RETURNING *`,
       [convoId, nSender, nReceiver, nMsgTxt]
     );
   },
   linkNewMsgToConvo: async (msgId, timestamp, convoId) => {
-    const result = await executeQuery(`
+    const result = await executeQuery(
+      `
       UPDATE conversations
       SET latest_msg_id = $1, latest_msg_timestamp = $2 
       WHERE convo_id = $3`,
@@ -163,7 +175,8 @@ const usersModel = {
     return result.length > 0;
   },
   updateMsgsReadState: async (convoId, currentUserId) => {
-    const result = await executeQuery(`
+    const result = await executeQuery(
+      `
       UPDATE \"messages\"
       SET is_read = true
       WHERE convo_id = $1 AND receiver_id = $2 AND is_read = false`,
@@ -173,7 +186,8 @@ const usersModel = {
     return result.length > 0;
   },
   acceptFriendRequest: async (userId, requesterId) => {
-    const result = await executeQuery(`
+    const result = await executeQuery(
+      `
       INSERT INTO \"userrelationships\" (user_id, friend_id)
       VALUES ($1, $2) 
       RETURNING *`,
@@ -183,11 +197,22 @@ const usersModel = {
     return result.length > 0;
   },
   deleteFriendRequestNotification: async (notiId) => {
-    const result = await executeQuery(`
+    const result = await executeQuery(
+      `
       DELETE FROM \"notifications\"
       WHERE noti_id = $1 
       RETURNING *`,
       [notiId]
+    );
+
+    return result.length > 0;
+  },
+  createPetTransReqNoti: async (receiverId, refUser, petId) => {
+    const result = await executeQuery(`
+      INSERT INTO \"notifications\" (receiver_id, title, sub_heading, type, ref_user_id, pet_id)
+      VALUES($1, 'You have a pending pet transfer request', ' wants to transfer their pet to you', 't-request', $2, $3)
+      RETURNING *`,
+      [receiverId, refUser, petId]
     );
 
     return result.length > 0;
@@ -219,6 +244,14 @@ const usersModel = {
 
     return result.length > 0;
   },
+  createPetTransferReq: async (petId, currentPetOwnerId, nextOwnerId) => {
+    return await executeQuery(`
+      INSERT INTO \"pettransferrequests\" (pet_id, current_owner_id, next_owner_id)
+      VALUES ($1, $2, $3)
+      RETURNING *`,
+      [petId, currentPetOwnerId, nextOwnerId]
+    );
+  }
 };
 
 module.exports = usersModel;

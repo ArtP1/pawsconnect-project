@@ -139,6 +139,21 @@ const acceptFriendReq = async (authHeader: string, body: { requesterId: string, 
 }
 
 
+const createPetTransferReq = async (authHeader: string, body: { nextOwnerId: string, petId: string}): Promise<ApiResponse> => {
+    const response = await fetch(`/api/users/pet/transfer`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${authHeader}`
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+    return data;
+}
+
+
 export {
     loginUser,
     signupUser,
@@ -147,5 +162,6 @@ export {
     fetchUserFriends,
     fetchUserId,
     fetchAllUsersForSearch,
-    acceptFriendReq
+    acceptFriendReq,
+    createPetTransferReq
 }
