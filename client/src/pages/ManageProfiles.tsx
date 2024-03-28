@@ -54,17 +54,6 @@ export const ManageProfiles = () => {
     isAlert: userIsAlert,
   } = useUser(`${authHeader}`);
 
-  const {
-    userPets,
-    updatePet,
-    deletePet,
-    addNewPet,
-    loadingPets,
-    error: petsError,
-    success: petsSuccess,
-    isAlert: petsIsAlert,
-  } = usePet(`${authHeader}`);
-
 
   const {
     userPets,
@@ -95,7 +84,7 @@ export const ManageProfiles = () => {
   const [petBreed, setPetBreed] = useState("");
   const [petColor, setPetColor] = useState("");
 
-  
+
   const [newPetName, setNewPetName] = useState("");
   const [newPetAge, setNewPetAge] = useState(0);
   const [newPetProfilePicture, setNewPetProfilePicture] = useState("");
@@ -216,7 +205,7 @@ export const ManageProfiles = () => {
                     nLocation: location,
                     nPrefLang: prefLang,
                   })
-                  }
+                }
                 }
               >
                 <div className="grid grid-cols-2 gap-2">

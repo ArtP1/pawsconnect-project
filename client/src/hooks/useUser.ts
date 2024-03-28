@@ -6,14 +6,18 @@ import {
     loginUser,
     signupUser,
     fetchUserId,
-    fetchAllUsersForSearch
+    fetchAllUsersForSearch,
+    acceptFriendReq
 } from "@/services/userService"; // adjust the import path as needed
 import { UserProfileUpdateBody } from "@/models/userModel";
 import { User } from "@/models/userModel";
 import { UserSignUp } from "@/models/userModel";
-
+import useNotifications from "./useNotifications";
 
 const useUser = (authHeader?: string) => {
+    const { refreshNotifications } = useNotifications(`${authHeader}`);
+
+
     const [userProfile, setUserProfile] = useState<User>({} as User);
     const [userFriends, setUserFriends] = useState<User[]>([]);
   
@@ -139,7 +143,21 @@ const useUser = (authHeader?: string) => {
         }
 
     }, [authHeader]);
-  
+    
+
+    const acceptFriendRequest = async (requesterId : string, notiId: string) => {
+        if(!authHeader) return;
+
+        const resp = await acceptFriendReq(authHeader, { requesterId, notiId });
+
+        if(resp.success) {
+            setSuccess(resp.message);
+            refreshNotifications();
+        } else {
+            setError(resp.message);
+        }
+    }
+
 
     return {
         login,
@@ -156,6 +174,7 @@ const useUser = (authHeader?: string) => {
         refreshUserFriends,
         retrieveAndSetUserId,
         getAllUsersForSearch,
+        acceptFriendRequest,
         updateProfile,
         isAlert,
     };

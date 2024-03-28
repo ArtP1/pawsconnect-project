@@ -58,7 +58,7 @@ export const compressImage = (imageDataUrl: string): Promise<string> => {
 
 // NPM packet source: https://www.npmjs.com/package/date-fns
 // Developer page docs source: https://date-fns.org/docs/Getting-Started
-export const formatMsgDate = (date: Date | string): string => {
+export const formatDate = (date: Date | string): string => {
   const now = new Date();
   const messageDate = new Date(date);
 

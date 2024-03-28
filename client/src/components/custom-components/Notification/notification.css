@@ -1,0 +1,81 @@
+.notification {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  text-align: left;
+  gap: 1rem;
+  width: 100%;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.labels {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+.title {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+.user-ref {
+  text-decoration: solid underline;
+  color: blue;
+}
+
+.sub-heading {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.time {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #9ca3af;
+}
+
+
+.accept {
+  margin-right: 5px;
+}
+
+.content {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding-left: 24px;
+  color: #6b7280;
+}
+
+.info,
+.post-l,
+.post-c,
+.f-request,
+.t-request {
+  color: blue;
+}
+
+.success {
+  color: green;
+}
+
+.warning {
+  color: red
+}
+
+
+.default {
+  color: black;
+}

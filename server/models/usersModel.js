@@ -34,8 +34,7 @@ const usersModel = {
     );
   },
   getFriends: async (id) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       SELECT u.user_id, u.first_name, u.last_name, u.username, u.profile_pic, u.location 
       FROM \"users\" u
       JOIN \"userrelationships\" ur ON u.user_id = ur.friend_id 
@@ -44,8 +43,7 @@ const usersModel = {
     );
   },
   getUserById: async (id) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       SELECT * FROM \"users\" 
       WHERE user_id = $1`,
       [id]
@@ -57,21 +55,18 @@ const usersModel = {
     ]);
   },
   getUserFriendsById: async (id) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       SELECT * FROM \"userrelationships\" 
       WHERE user_id = $1`,
       [id]
     );
   },
   getUserByEmail: async (email) => {
-    return await executeQuery(`SELECT * FROM \"users\" WHERE email = $1`, [
-      email,
-    ]);
+    return await executeQuery(`SELECT * FROM \"users\" WHERE email = $1`, 
+    [email]);
   },
   getUserConvos: async (id) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       SELECT
         c.convo_id,
         u.user_id AS receiver_id,
@@ -98,8 +93,7 @@ const usersModel = {
     );
   },
   getUserConvoMsgs: async (userId, otherUserId) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       SELECT
         m.msg_id,
         m.sender_id,
@@ -113,33 +107,53 @@ const usersModel = {
       [userId, otherUserId]
     );
   },
+  getUserNotifications: async (id) => {
+    return await executeQuery(`
+      SELECT 
+        n.noti_id, 
+        n.title, 
+        n.sub_heading, 
+        n.type, 
+        n.is_read, 
+        n.created_at, 
+        n.post_id, 
+        n.ref_user_id,
+        p.content,
+        u.username AS ref_username 
+      FROM \"notifications\" n
+      LEFT JOIN
+        \"posts\" p ON p.post_id = n.post_id
+      LEFT JOIN 
+        \"users\" u ON u.user_id = n.ref_user_id 
+      WHERE n.receiver_id = $1
+      ORDER BY 
+        n.created_at DESC`,
+      [id]
+    );
+  },
   createUser: async (firstName, lastName, username, email, hashedPassword) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       INSERT INTO \"users\" (first_name, last_name, username, email, password) 
       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [firstName, lastName, username, email, hashedPassword]
     );
   },
   createConvo: async (nSender, nReceiver) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       INSERT INTO \"conversations\" (participant_one , participant_two) 
       VALUES ($1, $2) RETURNING *`,
       [nSender, nReceiver]
     );
   },
   createMsg: async (convoId, nSender, nReceiver, nMsgTxt) => {
-    return await executeQuery(
-      `
+    return await executeQuery(`
       INSERT INTO \"messages\" (convo_id, sender_id, receiver_id, message_txt)
       VALUES ($1, $2, $3, $4) RETURNING *`,
       [convoId, nSender, nReceiver, nMsgTxt]
     );
   },
   linkNewMsgToConvo: async (msgId, timestamp, convoId) => {
-    const result = await executeQuery(
-      `
+    const result = await executeQuery(`
       UPDATE conversations
       SET latest_msg_id = $1, latest_msg_timestamp = $2 
       WHERE convo_id = $3`,
@@ -154,6 +168,26 @@ const usersModel = {
       SET is_read = true
       WHERE convo_id = $1 AND receiver_id = $2 AND is_read = false`,
       [convoId, currentUserId]
+    );
+
+    return result.length > 0;
+  },
+  acceptFriendRequest: async (userId, requesterId) => {
+    const result = await executeQuery(`
+      INSERT INTO \"userrelationships\" (user_id, friend_id)
+      VALUES ($1, $2) 
+      RETURNING *`,
+      [userId, requesterId]
+    );
+
+    return result.length > 0;
+  },
+  deleteFriendRequestNotification: async (notiId) => {
+    const result = await executeQuery(`
+      DELETE FROM \"notifications\"
+      WHERE noti_id = $1 
+      RETURNING *`,
+      [notiId]
     );
 
     return result.length > 0;

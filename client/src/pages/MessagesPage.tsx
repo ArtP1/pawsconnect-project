@@ -20,7 +20,7 @@ import { IoIosSend } from "react-icons/io";
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import { LuCombine } from "react-icons/lu";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { formatMsgDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { UserConvSnippet } from "@/models/msgModel";
 import { UserSnippet } from "@/models/userModel";
 import useMessages from "@/hooks/useMessages";
@@ -263,7 +263,7 @@ export const MessagesPage = () => {
                                                 </div>
                                             </div>
                                             <div className="ml-4 text-xs text-gray-500 dark:text-gray-400">
-                                                {formatMsgDate(convo.timestamp)}
+                                                {formatDate(convo.timestamp)}
                                             </div>
                                         </div>
                                     ))}
@@ -291,7 +291,7 @@ export const MessagesPage = () => {
                                                     </Avatar>
                                                     <div className={`p-3 rounded-lg max-w-lg ${isCurrentUserMessage ? 'bg-blue-100 dark:bg-blue-900 text-right' : 'bg-gray-200 dark:bg-gray-800'}`}>
                                                         <p className="mb-2 text-sm">{msg.message_txt}</p>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400">{formatMsgDate(msg.timestamp)}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">{formatDate(msg.timestamp)}</div>
                                                     </div>
                                                 </div>
                                             </div>

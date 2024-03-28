@@ -98,7 +98,7 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
 
                     <div className="flex h-[90px] justify-center items-center border-b">
 
-                        <span className="h-fit">{getPageTitle()}</span>
+                        <span className="h-fit font-bold">{getPageTitle()}</span>
                     </div>
 
                     <nav className="flex-grow p-4 space-y-7 overflow-auto">
@@ -120,7 +120,7 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
 
                         <Link
                             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
-                            to="#">
+                            to="/notifications">
                             <IoIosNotifications className="h-5 w-5" />
                             <span>Notifications</span>
                         </Link>
@@ -239,8 +239,8 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
                             </DialogContent>
                         </Dialog>
                     </nav>
-                </div>
-
+                </div>  
+                
                 {children}
             </div>
 
